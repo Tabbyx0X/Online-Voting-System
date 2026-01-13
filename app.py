@@ -721,18 +721,18 @@ def voter_register():
 @limiter.limit("5 per minute", error_message="Too many login attempts. Please wait a minute.")
 def voter_login():
     if request.method == 'POST':
-        voter_id = sanitize_input(request.form.get('voter_id'))
+        email = sanitize_input(request.form.get('email')).lower()
         password = request.form.get('password')
         college_code = sanitize_input(request.form.get('college_code'))
         
-        voter = Voter.query.filter_by(voter_id=voter_id, college_code=college_code).first()
+        voter = Voter.query.filter_by(email=email, college_code=college_code).first()
         
         if voter and voter.check_password(password):
             session['voter_id'] = voter.id
             flash('Login successful!', 'success')
             return redirect(url_for('voter_dashboard'))
         else:
-            flash('Invalid voter ID, password, or college code', 'danger')
+            flash('Invalid email, password, or college code', 'danger')
     
     return render_template('voter/login.html')
 
