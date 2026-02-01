@@ -120,25 +120,13 @@ def add_security_headers(response):
 
 # ==================== Models ====================
 
-class College(db.Model):
-    __tablename__ = 'colleges'
-    id = db.Column(db.Integer, primary_key=True)
-    college_code = db.Column(db.String(20), unique=True, nullable=False)
-    college_name = db.Column(db.String(200), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    users = db.relationship('Admin', backref='college', lazy=True)
-    elections = db.relationship('Election', backref='college', lazy=True)
-    voters = db.relationship('Voter', backref='college', lazy=True)
-
-
 class Admin(UserMixin, db.Model):
     __tablename__ = 'admins'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), nullable=False)
+    username = db.Column(db.String(80), nullable=False, unique=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-    role = db.Column(db.String(20), default='admin')  # 'admin' or 'teacher'
-    college_code = db.Column(db.String(20), db.ForeignKey('colleges.college_code'), nullable=True)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    role = db.Column(db.String(20), default='admin')
     created_at = db.Column(db.DateTime, default=datetime.now)
 
     def set_password(self, password):
@@ -147,11 +135,8 @@ class Admin(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
-    def is_super_admin(self):
-        return self.role == 'admin' and self.college_code is None
-    
-    def is_teacher(self):
-        return self.role == 'teacher'
+    def is_admin(self):
+        return self.role == 'admin'
 
 
 class Election(db.Model):
@@ -162,7 +147,6 @@ class Election(db.Model):
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(20), default='upcoming')  # upcoming, active, completed
-    college_code = db.Column(db.String(20), db.ForeignKey('colleges.college_code'), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('admins.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
     candidates = db.relationship('Candidate', backref='election', lazy=True, cascade='all, delete-orphan')
@@ -196,11 +180,10 @@ class Candidate(db.Model):
 class Voter(db.Model):
     __tablename__ = 'voters'
     id = db.Column(db.Integer, primary_key=True)
-    voter_id = db.Column(db.String(50), nullable=False)
+    voter_id = db.Column(db.String(50), nullable=False, unique=True)
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    college_code = db.Column(db.String(20), db.ForeignKey('colleges.college_code'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
     votes = db.relationship('Vote', backref='voter', lazy=True)
 
@@ -415,21 +398,15 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        college_code = request.form.get('college_code', '').strip()
         
-        # Super admin login (no college code)
-        if not college_code:
-            admin = Admin.query.filter_by(username=username, college_code=None).first()
-        else:
-            # Teacher login (with college code)
-            admin = Admin.query.filter_by(username=username, college_code=college_code).first()
+        admin = Admin.query.filter_by(username=username).first()
         
         if admin and admin.check_password(password):
             login_user(admin)
             flash('Login successful!', 'success')
             return redirect(url_for('admin_dashboard'))
         else:
-            flash('Invalid credentials or college code', 'danger')
+            flash('Invalid credentials', 'danger')
     
     return render_template('admin/login.html')
 
@@ -445,29 +422,16 @@ def logout():
 @app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
-    # Super admin sees all elections
-    if current_user.is_super_admin():
-        elections = Election.query.all()
-    else:
-        # Teachers see only their college's elections
-        elections = Election.query.filter_by(college_code=current_user.college_code).all()
+    elections = Election.query.all()
     
     for election in elections:
         election.update_status()
     db.session.commit()
     
-    if current_user.is_super_admin():
-        total_elections = Election.query.count()
-        total_candidates = Candidate.query.count()
-        total_voters = Voter.query.count()
-        total_votes = Vote.query.count()
-    else:
-        total_elections = Election.query.filter_by(college_code=current_user.college_code).count()
-        total_candidates = db.session.query(Candidate).join(Election).filter(
-            Election.college_code == current_user.college_code).count()
-        total_voters = Voter.query.filter_by(college_code=current_user.college_code).count()
-        total_votes = db.session.query(Vote).join(Election).filter(
-            Election.college_code == current_user.college_code).count()
+    total_elections = Election.query.count()
+    total_candidates = Candidate.query.count()
+    total_voters = Voter.query.count()
+    total_votes = Vote.query.count()
     
     return render_template('admin/dashboard.html', 
                          elections=elections,
@@ -480,19 +444,14 @@ def admin_dashboard():
 @app.route('/admin/elections')
 @login_required
 def manage_elections():
-    if current_user.is_super_admin():
-        elections = Election.query.all()
-        colleges = College.query.all()
-    else:
-        elections = Election.query.filter_by(college_code=current_user.college_code).all()
-        colleges = []
+    elections = Election.query.all()
     
     # Update election statuses based on current time
     for election in elections:
         election.update_status()
     db.session.commit()
     
-    return render_template('admin/elections.html', elections=elections, colleges=colleges)
+    return render_template('admin/elections.html', elections=elections)
 
 
 @app.route('/admin/elections/add', methods=['GET', 'POST'])
@@ -504,18 +463,11 @@ def add_election():
         start_date = datetime.strptime(request.form.get('start_date'), '%Y-%m-%dT%H:%M')
         end_date = datetime.strptime(request.form.get('end_date'), '%Y-%m-%dT%H:%M')
         
-        # Super admin can select college, teachers use their own college
-        if current_user.is_super_admin():
-            college_code = request.form.get('college_code')
-        else:
-            college_code = current_user.college_code
-        
         election = Election(
             title=title,
             description=description,
             start_date=start_date,
             end_date=end_date,
-            college_code=college_code,
             created_by=current_user.id
         )
         election.update_status()
@@ -525,9 +477,7 @@ def add_election():
         flash('Election created successfully!', 'success')
         return redirect(url_for('manage_elections'))
     
-    # Get colleges for super admin
-    colleges = College.query.all() if current_user.is_super_admin() else []
-    return render_template('admin/add_election.html', colleges=colleges)
+    return render_template('admin/add_election.html')
 
 
 @app.route('/admin/elections/<int:election_id>/edit', methods=['GET', 'POST'])
@@ -682,7 +632,6 @@ def voter_register():
         name = sanitize_input(request.form.get('name'))
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password')
-        college_code = sanitize_input(request.form.get('college_code'))
         
         # Validate password strength
         is_strong, password_error = is_strong_password(password)
@@ -696,13 +645,7 @@ def voter_register():
             flash(email_error, 'danger')
             return redirect(url_for('voter_register'))
         
-        # Check if college exists
-        college = College.query.filter_by(college_code=college_code).first()
-        if not college:
-            flash('Invalid college code!', 'danger')
-            return redirect(url_for('voter_register'))
-        
-        # Check if voter ID already exists (globally unique)
+        # Check if voter ID already exists
         if Voter.query.filter_by(voter_id=voter_id).first():
             flash('Voter ID already exists! Please use a different Voter ID.', 'danger')
             return redirect(url_for('voter_register'))
@@ -712,7 +655,7 @@ def voter_register():
             flash('Email already registered! Please use a different email or login.', 'danger')
             return redirect(url_for('voter_register'))
         
-        voter = Voter(voter_id=voter_id, name=name, email=email, college_code=college_code)
+        voter = Voter(voter_id=voter_id, name=name, email=email)
         voter.set_password(password)
         
         db.session.add(voter)
@@ -729,16 +672,15 @@ def voter_login():
     if request.method == 'POST':
         email = sanitize_input(request.form.get('email')).lower()
         password = request.form.get('password')
-        college_code = sanitize_input(request.form.get('college_code'))
         
-        voter = Voter.query.filter_by(email=email, college_code=college_code).first()
+        voter = Voter.query.filter_by(email=email).first()
         
         if voter and voter.check_password(password):
             session['voter_id'] = voter.id
             flash('Login successful!', 'success')
             return redirect(url_for('voter_dashboard'))
         else:
-            flash('Invalid email, password, or college code', 'danger')
+            flash('Invalid email or password', 'danger')
     
     return render_template('voter/login.html')
 
@@ -832,16 +774,13 @@ def voter_dashboard():
     voter = Voter.query.get(session['voter_id'])
     
     # Update election statuses based on current time before filtering
-    elections_to_check = Election.query.filter_by(college_code=voter.college_code).all()
+    elections_to_check = Election.query.all()
     for election in elections_to_check:
         election.update_status()
     db.session.commit()
     
-    # Show only active elections from voter's college
-    elections = Election.query.filter_by(
-        status='active', 
-        college_code=voter.college_code
-    ).all()
+    # Show only active elections
+    elections = Election.query.filter_by(status='active').all()
     
     return render_template('voter/dashboard.html', voter=voter, elections=elections)
 
@@ -892,99 +831,16 @@ def vote(election_id):
     return render_template('voter/vote.html', election=election, candidates=candidates)
 
 
-# ==================== College & Teacher Management ====================
-
-@app.route('/admin/colleges', methods=['GET'])
-@login_required
-def manage_colleges():
-    if not current_user.is_super_admin():
-        flash('Access denied!', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    colleges = College.query.all()
-    return render_template('admin/colleges.html', colleges=colleges)
-
-
-@app.route('/admin/colleges/add', methods=['POST'])
-@login_required
-def add_college():
-    if not current_user.is_super_admin():
-        flash('Access denied!', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    college_code = request.form.get('college_code').strip().upper()
-    college_name = request.form.get('college_name')
-    
-    if College.query.filter_by(college_code=college_code).first():
-        flash('College code already exists!', 'danger')
-        return redirect(url_for('manage_colleges'))
-    
-    college = College(college_code=college_code, college_name=college_name)
-    db.session.add(college)
-    db.session.commit()
-    flash(f'College {college_name} added successfully!', 'success')
-    return redirect(url_for('manage_colleges'))
-
-
-@app.route('/admin/teachers', methods=['GET'])
-@login_required
-def manage_teachers():
-    if not current_user.is_super_admin():
-        flash('Access denied!', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    teachers = Admin.query.filter_by(role='teacher').all()
-    colleges = College.query.all()
-    return render_template('admin/teachers.html', teachers=teachers, colleges=colleges)
-
-
-@app.route('/admin/teachers/add', methods=['POST'])
-@login_required
-def add_teacher():
-    if not current_user.is_super_admin():
-        flash('Access denied!', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
-    username = request.form.get('username')
-    email = request.form.get('email')
-    password = request.form.get('password')
-    college_code = request.form.get('college_code')
-    
-    # Check if college exists
-    if not College.query.filter_by(college_code=college_code).first():
-        flash('Invalid college code!', 'danger')
-        return redirect(url_for('manage_teachers'))
-    
-    teacher = Admin(
-        username=username,
-        email=email,
-        role='teacher',
-        college_code=college_code
-    )
-    teacher.set_password(password)
-    
-    db.session.add(teacher)
-    db.session.commit()
-    flash(f'Teacher {username} added successfully!', 'success')
-    return redirect(url_for('manage_teachers'))
-
-
 # ==================== Voter Management ====================
 
 @app.route('/admin/voters', methods=['GET'])
 @login_required
 def manage_voters():
     """View and manage registered voters"""
-    if current_user.is_super_admin():
-        # Use joinedload for eager loading to avoid N+1 queries
-        voters = Voter.query.options(joinedload(Voter.votes)).order_by(Voter.created_at.desc()).all()
-        colleges = College.query.all()
-    else:
-        # Teachers can only see voters from their college
-        voters = Voter.query.options(joinedload(Voter.votes)).filter_by(college_code=current_user.college_code).order_by(Voter.created_at.desc()).all()
-        colleges = []
+    # Use joinedload for eager loading to avoid N+1 queries
+    voters = Voter.query.options(joinedload(Voter.votes)).order_by(Voter.created_at.desc()).all()
     
-    return render_template('admin/voters.html', voters=voters, colleges=colleges)
+    return render_template('admin/voters.html', voters=voters)
 
 
 @app.route('/admin/voters/<int:voter_id>/delete', methods=['POST'])
@@ -992,11 +848,6 @@ def manage_voters():
 def delete_voter(voter_id):
     """Delete a voter account"""
     voter = Voter.query.get_or_404(voter_id)
-    
-    # Teachers can only delete voters from their college
-    if not current_user.is_super_admin() and voter.college_code != current_user.college_code:
-        flash('Access denied! You can only delete voters from your college.', 'danger')
-        return redirect(url_for('manage_voters'))
     
     voter_name = voter.name
     voter_email = voter.email
@@ -1015,12 +866,7 @@ def delete_voter(voter_id):
 @app.route('/admin/database')
 @login_required
 def view_database():
-    if not current_user.is_super_admin():
-        flash('Access denied! Super admin only.', 'danger')
-        return redirect(url_for('admin_dashboard'))
-    
     # Get all data from tables
-    colleges = College.query.all()
     admins = Admin.query.all()
     voters = Voter.query.all()
     elections = Election.query.all()
@@ -1028,7 +874,6 @@ def view_database():
     votes = Vote.query.all()
     
     return render_template('admin/database.html',
-                         colleges=colleges,
                          admins=admins,
                          voters=voters,
                          elections=elections,
@@ -1042,18 +887,16 @@ def init_db():
     with app.app_context():
         db.create_all()
         
-        # Create default super admin if not exists (no college code)
-        if not Admin.query.filter_by(username='admin', college_code=None).first():
+        # Create default admin if not exists
+        if not Admin.query.filter_by(username='admin').first():
             admin = Admin(
                 username='admin', 
                 email='admin@voting.com',
-                role='admin',
-                college_code=None
+                role='admin'
             )
             admin.set_password('admin123')
             db.session.add(admin)
             db.session.commit()
-            # print("Default super admin created: username='admin', password='admin123' (no college code needed)")
 
 
 if __name__ == '__main__':
