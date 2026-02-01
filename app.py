@@ -486,6 +486,12 @@ def manage_elections():
     else:
         elections = Election.query.filter_by(college_code=current_user.college_code).all()
         colleges = []
+    
+    # Update election statuses based on current time
+    for election in elections:
+        election.update_status()
+    db.session.commit()
+    
     return render_template('admin/elections.html', elections=elections, colleges=colleges)
 
 
@@ -824,6 +830,13 @@ def voter_dashboard():
         return redirect(url_for('voter_login'))
     
     voter = Voter.query.get(session['voter_id'])
+    
+    # Update election statuses based on current time before filtering
+    elections_to_check = Election.query.filter_by(college_code=voter.college_code).all()
+    for election in elections_to_check:
+        election.update_status()
+    db.session.commit()
+    
     # Show only active elections from voter's college
     elections = Election.query.filter_by(
         status='active', 
@@ -848,6 +861,10 @@ def vote(election_id):
     
     voter = Voter.query.get(session['voter_id'])
     election = Election.query.get_or_404(election_id)
+    
+    # Update election status based on current time
+    election.update_status()
+    db.session.commit()
     
     if election.status != 'active':
         flash('This election is not currently active!', 'warning')
