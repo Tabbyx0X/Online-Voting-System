@@ -1,94 +1,54 @@
 {% extends 'base.html' %}
 
-{% block title %}Admin Profile{% endblock %}
+{% block title %}Profile{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-6">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2><i class="fas fa-user-circle"></i> Admin Profile</h2>
-            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
+            <h1 class="page-title">Profile</h1>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
         </div>
 
-        <!-- Profile Information Card -->
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Account Information</h5>
-            </div>
+            <div class="card-header">Account Details</div>
             <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <strong>Username:</strong>
-                    </div>
-                    <div class="col-md-8">
-                        <code>{{ current_user.username }}</code>
-                    </div>
+                <div class="row mb-2">
+                    <div class="col-4 text-secondary">Username</div>
+                    <div class="col-8"><code>{{ current_user.username }}</code></div>
                 </div>
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <strong>Email:</strong>
-                    </div>
-                    <div class="col-md-8">
-                        {{ current_user.email }}
-                    </div>
+                <div class="row mb-2">
+                    <div class="col-4 text-secondary">Email</div>
+                    <div class="col-8">{{ current_user.email }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
-                        <strong>Account Created:</strong>
-                    </div>
-                    <div class="col-md-8">
-                        {{ current_user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
-                    </div>
+                    <div class="col-4 text-secondary">Created</div>
+                    <div class="col-8">{{ current_user.created_at.strftime('%b %d, %Y') }}</div>
                 </div>
             </div>
         </div>
 
-        <!-- Change Password Card -->
         <div class="card">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="fas fa-key"></i> Change Password</h5>
-            </div>
+            <div class="card-header">Change Password</div>
             <div class="card-body">
                 <form method="POST" id="passwordForm">
                     <div class="mb-3">
-                        <label for="current_password" class="form-label">
-                            <i class="fas fa-lock"></i> Current Password <span class="text-danger">*</span>
-                        </label>
-                        <input type="password" class="form-control" id="current_password" 
-                               name="current_password" required>
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="current_password" name="current_password" required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="new_password" class="form-label">
-                            <i class="fas fa-lock"></i> New Password <span class="text-danger">*</span>
-                        </label>
-                        <input type="password" class="form-control" id="new_password" 
-                               name="new_password" required minlength="6">
-                        <small class="form-text text-muted">
-                            Password must be at least 6 characters long
-                        </small>
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new_password" name="new_password" required minlength="6">
+                        <div class="form-text">Minimum 6 characters</div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="confirm_password" class="form-label">
-                            <i class="fas fa-lock"></i> Confirm New Password <span class="text-danger">*</span>
-                        </label>
-                        <input type="password" class="form-control" id="confirm_password" 
-                               name="confirm_password" required minlength="6">
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required minlength="6">
                     </div>
 
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> 
-                        <strong>Security Tip:</strong> Use a strong password with a mix of letters, numbers, and symbols.
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-warning btn-lg">
-                            <i class="fas fa-save"></i> Change Password
-                        </button>
-                    </div>
+                    <button type="submit" class="btn btn-primary">Update Password</button>
                 </form>
             </div>
         </div>
@@ -96,32 +56,13 @@
 </div>
 
 <script>
-// Client-side password validation
 document.getElementById('passwordForm').addEventListener('submit', function(e) {
     const newPassword = document.getElementById('new_password').value;
     const confirmPassword = document.getElementById('confirm_password').value;
-    
     if (newPassword !== confirmPassword) {
         e.preventDefault();
-        alert('New passwords do not match!');
-        return false;
-    }
-    
-    if (newPassword.length < 6) {
-        e.preventDefault();
-        alert('Password must be at least 6 characters long!');
-        return false;
+        alert('Passwords do not match');
     }
 });
 </script>
-
-<style>
-    code {
-        background-color: #f8f9fa;
-        padding: 4px 8px;
-        border-radius: 4px;
-        color: #d63384;
-        font-size: 1.1em;
-    }
-</style>
 {% endblock %}

@@ -1,74 +1,67 @@
 {% extends 'base.html' %}
 
-{% block title %}Manage Candidates - {{ election.title }}{% endblock %}
+{% block title %}Candidates – {{ election.title }}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2><i class="fas fa-users"></i> Manage Candidates</h2>
-        <p class="text-muted mb-0">Election: <strong>{{ election.title }}</strong></p>
+        <h1 class="page-title">Candidates</h1>
+        <p class="text-secondary small mb-0">{{ election.title }}</p>
     </div>
-    <div>
-        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back
-        </a>
-        <a href="{{ url_for('add_candidate', election_id=election.id) }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Add Candidate
-        </a>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Back</a>
+        <a href="{{ url_for('add_candidate', election_id=election.id) }}" class="btn btn-primary btn-sm">+ Add</a>
     </div>
 </div>
 
-<div class="row">
-    {% if election.candidates %}
-        {% for candidate in election.candidates %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    {% if candidate.photo_url %}
-                    <div class="text-center mb-3">
-                        <img src="{{ candidate.photo_url }}" alt="{{ candidate.name }}" 
-                             class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+{% if election.candidates %}
+<div class="row g-3">
+    {% for candidate in election.candidates %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-body">
+                {% if candidate.photo_url %}
+                <div class="text-center mb-3">
+                    <img src="{{ candidate.photo_url }}" alt="{{ candidate.name }}" 
+                         class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover; border: 2px solid var(--border-color);">
+                </div>
+                {% else %}
+                <div class="text-center mb-3">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--bg-secondary); display: inline-flex; align-items: center; justify-content: center;">
+                        <span class="text-secondary" style="font-size: 2rem;">{{ candidate.name[0] }}</span>
                     </div>
-                    {% else %}
-                    <div class="text-center mb-3">
-                        <i class="fas fa-user-circle fa-5x text-secondary"></i>
-                    </div>
-                    {% endif %}
-                    
-                    <h5 class="card-title text-center">{{ candidate.name }}</h5>
-                    
-                    {% if candidate.party %}
-                    <p class="text-center text-muted mb-2">
-                        <i class="fas fa-flag"></i> {{ candidate.party }}
-                    </p>
-                    {% endif %}
-                    
-                    {% if candidate.description %}
-                    <p class="card-text small">{{ candidate.description }}</p>
-                    {% endif %}
-                    
-                    <div class="mt-3 d-flex gap-2">
-                        <a href="{{ url_for('edit_candidate', candidate_id=candidate.id) }}" class="btn btn-sm btn-warning flex-grow-1">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                        <form method="POST" action="{{ url_for('delete_candidate', candidate_id=candidate.id) }}" 
-                              class="flex-grow-1" onsubmit="return confirm('Are you sure?');">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <button type="submit" class="btn btn-sm btn-danger w-100">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </form>
-                    </div>
+                </div>
+                {% endif %}
+                
+                <h6 class="text-center mb-1">{{ candidate.name }}</h6>
+                
+                {% if candidate.party %}
+                <p class="text-center text-secondary small mb-2">{{ candidate.party }}</p>
+                {% endif %}
+                
+                {% if candidate.description %}
+                <p class="small text-secondary">{{ candidate.description[:100] }}{% if candidate.description|length > 100 %}...{% endif %}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-transparent border-top-0 pt-0">
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('edit_candidate', candidate_id=candidate.id) }}" class="btn btn-outline-secondary btn-sm flex-grow-1">Edit</a>
+                    <form method="POST" action="{{ url_for('delete_candidate', candidate_id=candidate.id) }}" 
+                          class="flex-grow-1" onsubmit="return confirm('Delete this candidate?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm text-danger w-100">Delete</button>
+                    </form>
                 </div>
             </div>
         </div>
-        {% endfor %}
-    {% else %}
-        <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="fas fa-info-circle"></i> No candidates added yet. Click "Add Candidate" to get started.
-            </div>
-        </div>
-    {% endif %}
+    </div>
+    {% endfor %}
 </div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5 text-muted">
+        No candidates yet. Add one to get started.
+    </div>
+</div>
+{% endif %}
 {% endblock %}

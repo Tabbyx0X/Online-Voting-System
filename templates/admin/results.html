@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Election Results - {{ election.title }}{% endblock %}
+{% block title %}Results – {{ election.title }}{% endblock %}
 
 {% block charts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
@@ -8,183 +8,130 @@
 
 {% block extra_css %}
 <style>
-    .chart-container {
-        position: relative;
-        height: 400px;
-        margin-bottom: 30px;
-    }
-    
-    .result-card {
-        border-left: 4px solid #2563eb;
-    }
-    
-    .vote-count {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #2563eb;
-    }
-    
-    .percentage {
-        font-size: 1.2rem;
-        color: #64748b;
-    }
+    .chart-container { position: relative; height: 300px; }
+    .vote-count { font-size: 1.75rem; font-weight: 600; color: var(--accent); }
+    .percentage { font-size: 0.875rem; color: var(--text-secondary); }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2><i class="fas fa-chart-bar"></i> Election Results</h2>
-        <p class="text-muted mb-0"><strong>{{ election.title }}</strong></p>
+        <h1 class="page-title">Results</h1>
+        <p class="text-secondary small mb-0">{{ election.title }}</p>
     </div>
-    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Back to Dashboard
-    </a>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-12">
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Election Information</h5>
-                <div class="row">
-                    <div class="col-md-3">
-                        <p class="mb-1"><strong>Status:</strong></p>
-                        <span class="status-badge status-{{ election.status }}">
-                            {{ election.status|capitalize }}
-                        </span>
-                    </div>
-                    <div class="col-md-3">
-                        <p class="mb-1"><strong>Start Date:</strong></p>
-                        <p>{{ election.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
-                    </div>
-                    <div class="col-md-3">
-                        <p class="mb-1"><strong>End Date:</strong></p>
-                        <p>{{ election.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
-                    </div>
-                    <div class="col-md-3">
-                        <p class="mb-1"><strong>Total Votes:</strong></p>
-                        <p class="vote-count mb-0">{{ total_votes }}</p>
-                    </div>
-                </div>
+                <div class="small text-secondary">Status</div>
+                <span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="small text-secondary">Start</div>
+                <div>{{ election.start_date.strftime('%b %d, %Y %H:%M') }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="small text-secondary">End</div>
+                <div>{{ election.end_date.strftime('%b %d, %Y %H:%M') }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="small text-secondary">Total Votes</div>
+                <div class="vote-count">{{ total_votes }}</div>
             </div>
         </div>
     </div>
 </div>
 
 {% if results %}
-<div class="row mb-4">
+<div class="row g-3 mb-4">
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Bar Chart</h5>
-            </div>
+            <div class="card-header">Bar Chart</div>
             <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="barChart"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="barChart"></canvas></div>
             </div>
         </div>
     </div>
-    
     <div class="col-md-6">
         <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Pie Chart</h5>
-            </div>
+            <div class="card-header">Distribution</div>
             <div class="card-body">
-                <div class="chart-container">
-                    <canvas id="pieChart"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="pieChart"></canvas></div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0"><i class="fas fa-table"></i> Detailed Results</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    {% for result in results %}
-                    <div class="col-md-6 mb-3">
-                        <div class="card result-card">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <h5 class="card-title mb-1">{{ result.name }}</h5>
-                                        {% if result.party %}
-                                        <p class="text-muted small mb-2">{{ result.party }}</p>
-                                        {% endif %}
-                                    </div>
-                                    <div class="text-end">
-                                        <div class="vote-count">{{ result.votes }}</div>
-                                        <div class="percentage">
-                                            {% if total_votes > 0 %}
-                                                {{ "%.1f"|format((result.votes / total_votes * 100)) }}%
-                                            {% else %}
-                                                0.0%
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="progress mt-2" style="height: 25px;">
-                                    <div class="progress-bar" role="progressbar" 
-                                         style="width: {% if total_votes > 0 %}{{ (result.votes / total_votes * 100) }}{% else %}0{% endif %}%"
-                                         aria-valuenow="{{ result.votes }}" aria-valuemin="0" aria-valuemax="{{ total_votes }}">
-                                        {{ result.votes }} votes
-                                    </div>
-                                </div>
-                            </div>
+<div class="card mb-4">
+    <div class="card-header">Candidates</div>
+    <div class="card-body">
+        <div class="row g-3">
+            {% for result in results %}
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center p-3" style="background: var(--bg-secondary); border-radius: 8px;">
+                    <div>
+                        <strong>{{ result.name }}</strong>
+                        {% if result.party %}<span class="text-secondary small d-block">{{ result.party }}</span>{% endif %}
+                    </div>
+                    <div class="text-end">
+                        <div class="vote-count">{{ result.votes }}</div>
+                        <div class="percentage">
+                            {% if total_votes > 0 %}{{ "%.1f"|format((result.votes / total_votes * 100)) }}%{% else %}0%{% endif %}
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
             </div>
+            {% endfor %}
         </div>
     </div>
 </div>
 {% else %}
-<div class="alert alert-info text-center">
-    <i class="fas fa-info-circle"></i> No votes cast yet or no candidates in this election.
+<div class="card">
+    <div class="card-body text-center py-5 text-muted">No votes cast yet.</div>
 </div>
 {% endif %}
 
-<!-- Detailed Votes Section - Who Voted for Whom -->
 {% if detailed_votes %}
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="mb-0"><i class="fas fa-users"></i> Detailed Vote Records</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>Voter ID</th>
-                                <th>Voter Name</th>
-                                <th>Voted For</th>
-                                <th>Timestamp</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for vote in detailed_votes %}
-                            <tr>
-                                <td><span class="badge bg-secondary">{{ vote.voter_id }}</span></td>
-                                <td>{{ vote.voter_name }}</td>
-                                <td><strong>{{ vote.candidate_name }}</strong></td>
-                                <td>{{ vote.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<div class="card">
+    <div class="card-header">Vote Records</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Voter ID</th>
+                        <th>Name</th>
+                        <th>Voted For</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vote in detailed_votes %}
+                    <tr>
+                        <td><code class="small">{{ vote.voter_id }}</code></td>
+                        <td>{{ vote.voter_name }}</td>
+                        <td><strong>{{ vote.candidate_name }}</strong></td>
+                        <td class="text-secondary">{{ vote.timestamp.strftime('%b %d, %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -197,132 +144,25 @@
     const labels = resultsData.map(r => r.name);
     const votes = resultsData.map(r => r.votes);
     
-    // Generate colors
-    const backgroundColors = [
-        'rgba(37, 99, 235, 0.8)',
-        'rgba(16, 185, 129, 0.8)',
-        'rgba(245, 158, 11, 0.8)',
-        'rgba(239, 68, 68, 0.8)',
-        'rgba(139, 92, 246, 0.8)',
-        'rgba(236, 72, 153, 0.8)',
-        'rgba(14, 165, 233, 0.8)',
-        'rgba(34, 197, 94, 0.8)'
-    ];
+    const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#0ea5e9', '#22c55e'];
     
-    const borderColors = [
-        'rgba(37, 99, 235, 1)',
-        'rgba(16, 185, 129, 1)',
-        'rgba(245, 158, 11, 1)',
-        'rgba(239, 68, 68, 1)',
-        'rgba(139, 92, 246, 1)',
-        'rgba(236, 72, 153, 1)',
-        'rgba(14, 165, 233, 1)',
-        'rgba(34, 197, 94, 1)'
-    ];
-    
-    // Bar Chart
-    const barCtx = document.getElementById('barChart').getContext('2d');
-    const barChart = new Chart(barCtx, {
+    new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Votes',
-                data: votes,
-                backgroundColor: backgroundColors,
-                borderColor: borderColors,
-                borderWidth: 2
-            }]
+            datasets: [{ label: 'Votes', data: votes, backgroundColor: colors.slice(0, labels.length), borderWidth: 0, borderRadius: 4 }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: 'Vote Count by Candidate',
-                    font: {
-                        size: 16
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }}, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }}}}
     });
     
-    // Pie Chart
-    const pieCtx = document.getElementById('pieChart').getContext('2d');
-    const pieChart = new Chart(pieCtx, {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: votes,
-                backgroundColor: backgroundColors,
-                borderColor: borderColors,
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right'
-                },
-                title: {
-                    display: true,
-                    text: 'Vote Distribution',
-                    font: {
-                        size: 16
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.parsed || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                            return label + ': ' + value + ' (' + percentage + '%)';
-                        }
-                    }
-                }
-            }
-        }
+    new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: { labels: labels, datasets: [{ data: votes, backgroundColor: colors.slice(0, labels.length), borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' }}}
     });
     
-    // Auto-refresh results every 10 seconds for active elections
     {% if election.status == 'active' %}
-    setInterval(function() {
-        fetch('/api/elections/{{ election.id }}/results')
-            .then(response => response.json())
-            .then(data => {
-                const newLabels = data.map(r => r.name);
-                const newVotes = data.map(r => r.votes);
-                
-                barChart.data.labels = newLabels;
-                barChart.data.datasets[0].data = newVotes;
-                barChart.update();
-                
-                pieChart.data.labels = newLabels;
-                pieChart.data.datasets[0].data = newVotes;
-                pieChart.update();
-                
-                // Optionally refresh the page to update the detailed results
-                // location.reload();
-            });
-    }, 10000);
+    setInterval(() => location.reload(), 15000);
     {% endif %}
 </script>
 {% endblock %}

@@ -3,51 +3,30 @@
 {% block title %}Admin Login{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-4">
+<div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
         <div class="card">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <i class="fas fa-user-shield fa-3x text-primary mb-3"></i>
-                    <h3 class="card-title">Admin Login</h3>
-                    <p class="text-muted">Login to manage elections</p>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <h1 class="h4 mb-1">Admin Login</h1>
+                    <p class="text-secondary small mb-0">Sign in to manage elections</p>
                 </div>
                 
                 <form method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                        </div>
-                    </div>
                     
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
                     </div>
                     
                     <div class="mb-4">
-                        <label for="college_code" class="form-label">College Code (leave empty for Super Admin)</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-school"></i></span>
-                            <input type="text" class="form-control" id="college_code" name="college_code" placeholder="Optional for teachers">
-                        </div>
-                        <small class="text-muted">Super Admin: leave blank | Teachers: enter your college code</small>
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </button>
+                    <button type="submit" class="btn btn-primary w-100">Sign In</button>
                 </form>
-                
-                <!-- <div class="text-center mt-3">
-                    <small class="text-muted">Default credentials: admin / admin123</small>
-                </div> -->
             </div>
         </div>
     </div>

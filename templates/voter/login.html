@@ -1,54 +1,36 @@
 {% extends 'base.html' %}
 
-{% block title %}Voter Login{% endblock %}
+{% block title %}Sign In{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-4">
+<div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
         <div class="card">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <i class="fas fa-user-check fa-3x text-primary mb-3"></i>
-                    <h3 class="card-title">Voter Login</h3>
-                    <p class="text-muted">Login to cast your vote</p>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <h1 class="h4 mb-1">Sign in</h1>
+                    <p class="text-secondary small mb-0">Enter your credentials to access your account</p>
                 </div>
                 
                 <form method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <div class="mb-3">
-                        <label for="college_code" class="form-label">College Code</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-school"></i></span>
-                            <input type="text" class="form-control" id="college_code" name="college_code" required>
-                        </div>
-                    </div>
                     
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="your.email@example.com" required>
-                        </div>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
                     </div>
                     
                     <div class="mb-4">
                         <label for="password" class="form-label">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
+                        <input type="password" class="form-control" id="password" name="password" required>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Sign In</button>
                     
-                    <div class="text-center mb-2">
-                        <small><a href="{{ url_for('voter_forgot_password') }}">Forgot Password?</a></small>
-                    </div>
-                    
-                    <div class="text-center">
-                        <small>Don't have an account? <a href="{{ url_for('voter_register') }}">Register here</a></small>
+                    <div class="text-center small">
+                        <a href="{{ url_for('voter_forgot_password') }}" class="text-muted">Forgot password?</a>
+                        <span class="mx-2 text-muted">·</span>
+                        <a href="{{ url_for('voter_register') }}">Create account</a>
                     </div>
                 </form>
             </div>

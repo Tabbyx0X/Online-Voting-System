@@ -1,58 +1,46 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Election{% endblock %}
+{% block title %}New Election{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-md-6">
+        <div class="mb-4">
+            <a href="{{ url_for('manage_elections') }}" class="text-secondary small">← Back to elections</a>
+        </div>
+        
         <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Create New Election</h4>
+            <div class="card-header">
+                <h1 class="h5 mb-0">New Election</h1>
             </div>
             <div class="card-body">
                 <form method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    
                     <div class="mb-3">
-                        <label for="title" class="form-label">Election Title *</label>
+                        <label for="title" class="form-label">Title</label>
                         <input type="text" class="form-control" id="title" name="title" required>
                     </div>
                     
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Optional"></textarea>
                     </div>
-                    
-                    {% if colleges %}
-                    <div class="mb-3">
-                        <label for="college_code" class="form-label">College *</label>
-                        <select class="form-select" id="college_code" name="college_code" required>
-                            <option value="">Select College</option>
-                            {% for college in colleges %}
-                            <option value="{{ college.college_code }}">{{ college.college_name }} ({{ college.college_code }})</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    {% endif %}
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="start_date" class="form-label">Start Date & Time *</label>
+                            <label for="start_date" class="form-label">Start Date</label>
                             <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
                         </div>
-                        
                         <div class="col-md-6 mb-3">
-                            <label for="end_date" class="form-label">End Date & Time *</label>
+                            <label for="end_date" class="form-label">End Date</label>
                             <input type="datetime-local" class="form-control" id="end_date" name="end_date" required>
                         </div>
                     </div>
                     
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ url_for('manage_elections') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancel
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Create Election
-                        </button>
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('manage_elections') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Create Election</button>
                     </div>
                 </form>
             </div>

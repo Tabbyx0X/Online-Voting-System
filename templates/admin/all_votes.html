@@ -1,88 +1,54 @@
 {% extends 'base.html' %}
 
-{% block title %}All Votes - Admin{% endblock %}
+{% block title %}All Votes{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-list-ul"></i> All Votes Cast</h2>
-    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left"></i> Back to Dashboard
-    </a>
+    <div>
+        <h1 class="page-title">All Votes</h1>
+        <span class="text-secondary small">{{ votes|length }} total votes</span>
+    </div>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
 </div>
 
 <div class="card">
-    <div class="card-header bg-white">
-        <h5 class="mb-0">
-            <i class="fas fa-vote-yea"></i> Complete Vote History
-            <span class="badge bg-primary ms-2">{{ votes|length }} Total Votes</span>
-        </h5>
-    </div>
-    <div class="card-body">
+    <div class="card-body p-0">
         {% if votes %}
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>Voter ID</th>
-                            <th>Voter Name</th>
-                            <th>Voter Email</th>
-                            <th>Election</th>
-                            <th>Candidate Voted For</th>
-                            <th>Party</th>
-                            <th>Vote Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for vote_data in votes %}
-                        {% set vote = vote_data[0] %}
-                        {% set voter = vote_data[1] %}
-                        {% set candidate = vote_data[2] %}
-                        {% set election = vote_data[3] %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><code>{{ voter.voter_id }}</code></td>
-                            <td><strong>{{ voter.name }}</strong></td>
-                            <td><small>{{ voter.email }}</small></td>
-                            <td>
-                                <span class="badge bg-info">{{ election.title }}</span>
-                            </td>
-                            <td><strong>{{ candidate.name }}</strong></td>
-                            <td>{{ candidate.party or 'Independent' }}</td>
-                            <td><small>{{ vote.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Summary Statistics -->
-            <div class="alert alert-info mt-3">
-                <i class="fas fa-info-circle"></i> 
-                <strong>Summary:</strong> Total of <strong>{{ votes|length }}</strong> votes have been cast across all elections.
-            </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Voter</th>
+                        <th>Election</th>
+                        <th>Candidate</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vote_data in votes %}
+                    {% set vote = vote_data[0] %}
+                    {% set voter = vote_data[1] %}
+                    {% set candidate = vote_data[2] %}
+                    {% set election = vote_data[3] %}
+                    <tr>
+                        <td>
+                            <strong>{{ voter.name }}</strong>
+                            <span class="text-secondary d-block small">{{ voter.voter_id }}</span>
+                        </td>
+                        <td>{{ election.title }}</td>
+                        <td>
+                            <strong>{{ candidate.name }}</strong>
+                            {% if candidate.party %}<span class="text-secondary small d-block">{{ candidate.party }}</span>{% endif %}
+                        </td>
+                        <td class="text-secondary small">{{ vote.timestamp.strftime('%b %d, %H:%M') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                <p class="text-muted">No votes have been cast yet.</p>
-                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">
-                    <i class="fas fa-tachometer-alt"></i> Go to Dashboard
-                </a>
-            </div>
+        <div class="text-center py-5 text-muted">No votes cast yet</div>
         {% endif %}
     </div>
 </div>
-
-<style>
-    .table td, .table th {
-        vertical-align: middle;
-    }
-    
-    code {
-        background-color: #f8f9fa;
-        padding: 2px 6px;
-        border-radius: 3px;
-        color: #d63384;
-    }
-</style>
 {% endblock %}

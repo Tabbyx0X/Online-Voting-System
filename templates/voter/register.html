@@ -1,75 +1,48 @@
 {% extends 'base.html' %}
 
-{% block title %}Voter Registration{% endblock %}
+{% block title %}Create Account{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5">
+<div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
         <div class="card">
-            <div class="card-body p-5">
-                <div class="text-center mb-4">
-                    <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
-                    <h3 class="card-title">Voter Registration</h3>
-                    <p class="text-muted">Create an account to vote</p>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <h1 class="h4 mb-1">Create account</h1>
+                    <p class="text-secondary small mb-0">Register to participate in elections</p>
                 </div>
                 
                 <form method="POST" id="registerForm">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    
                     <div class="mb-3">
-                        <label for="college_code" class="form-label">College Code *</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-school"></i></span>
-                            <input type="text" class="form-control" id="college_code" name="college_code" placeholder="e.g., TYIT2024" required>
-                        </div>
-                        <small class="form-text text-muted">Enter your college code provided by admin</small>
+                        <label for="voter_id" class="form-label">Voter ID</label>
+                        <input type="text" class="form-control" id="voter_id" name="voter_id" placeholder="Your unique ID" required>
+                        <div class="form-text">Your unique identification number</div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="voter_id" class="form-label">Voter ID *</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                            <input type="text" class="form-control" id="voter_id" name="voter_id" placeholder="e.g., STU001 or 12345" required>
-                        </div>
-                        <small class="form-text text-muted">Unique identification number</small>
+                        <label for="name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="John Doe" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="name" class="form-label">Full Name *</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="e.g., John Doe" required>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email Address *</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   placeholder="e.g., john.doe@college.edu" required
-                                   pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
-                        </div>
-                        <small class="form-text text-muted">Use your real email address (no temporary/disposable emails)</small>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" required>
                         <div id="emailFeedback" class="invalid-feedback"></div>
                     </div>
                     
                     <div class="mb-4">
-                        <label for="password" class="form-label">Password *</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" 
-                                   placeholder="Min 8 chars, 1 uppercase, 1 number" required minlength="8">
-                        </div>
-                        <small class="form-text text-muted">Min 8 characters with uppercase, lowercase, and number</small>
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Min 8 characters" required minlength="8">
+                        <div class="form-text">At least 8 characters with uppercase, lowercase, and number</div>
                         <div id="passwordFeedback" class="invalid-feedback"></div>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary w-100 mb-3">
-                        <i class="fas fa-user-plus"></i> Register
-                    </button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>
                     
-                    <div class="text-center">
-                        <small>Already have an account? <a href="{{ url_for('voter_login') }}">Login here</a></small>
+                    <div class="text-center small">
+                        Already have an account? <a href="{{ url_for('voter_login') }}">Sign in</a>
                     </div>
                 </form>
             </div>
@@ -78,114 +51,51 @@
 </div>
 
 <script>
-// Blocked disposable email domains (client-side check)
-const blockedDomains = [
-    'tempmail.com', 'temp-mail.org', 'guerrillamail.com', 'guerrillamail.org',
-    'mailinator.com', 'throwaway.email', 'fakeinbox.com', 'trashmail.com',
-    'yopmail.com', 'sharklasers.com', 'guerrillamail.info', 'grr.la',
-    'mailnesia.com', 'mytemp.email', 'tempmailaddress.com', 'throwawaymail.com',
-    'getnada.com', 'tempail.com', 'emailondeck.com', 'mohmal.com',
-    '10minutemail.com', '10minutemail.net', 'minutemail.com', 'tempinbox.com',
-    'discard.email', 'mailcatch.com', 'mailsac.com', 'maildrop.cc'
-];
+const blockedDomains = ['tempmail.com', 'temp-mail.org', 'guerrillamail.com', 'mailinator.com', 'throwaway.email', 'fakeinbox.com', 'trashmail.com', 'yopmail.com', '10minutemail.com', 'maildrop.cc'];
 
 const emailInput = document.getElementById('email');
 const emailFeedback = document.getElementById('emailFeedback');
-const form = document.querySelector('form');
+const passwordInput = document.getElementById('password');
+const passwordFeedback = document.getElementById('passwordFeedback');
 
 function validateEmail(email) {
     email = email.trim().toLowerCase();
-    
-    // Basic format check
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailPattern.test(email)) {
-        return { valid: false, message: 'Please enter a valid email address' };
-    }
-    
-    // Extract domain
+    if (!emailPattern.test(email)) return { valid: false, message: 'Please enter a valid email' };
     const domain = email.split('@')[1];
-    
-    // Check blocked domains
-    if (blockedDomains.includes(domain)) {
-        return { valid: false, message: 'Disposable/temporary emails are not allowed' };
-    }
-    
+    if (blockedDomains.includes(domain)) return { valid: false, message: 'Temporary emails not allowed' };
+    return { valid: true, message: '' };
+}
+
+function validatePassword(password) {
+    if (password.length < 8) return { valid: false, message: 'At least 8 characters required' };
+    if (!/[A-Z]/.test(password)) return { valid: false, message: 'Include an uppercase letter' };
+    if (!/[a-z]/.test(password)) return { valid: false, message: 'Include a lowercase letter' };
+    if (!/[0-9]/.test(password)) return { valid: false, message: 'Include a number' };
     return { valid: true, message: '' };
 }
 
 emailInput.addEventListener('blur', function() {
     const result = validateEmail(this.value);
-    
     if (!result.valid && this.value.length > 0) {
         this.classList.add('is-invalid');
-        this.classList.remove('is-valid');
         emailFeedback.textContent = result.message;
-        emailFeedback.style.display = 'block';
-    } else if (this.value.length > 0) {
+    } else {
         this.classList.remove('is-invalid');
-        this.classList.add('is-valid');
-        emailFeedback.style.display = 'none';
     }
 });
-
-emailInput.addEventListener('input', function() {
-    if (this.classList.contains('is-invalid')) {
-        const result = validateEmail(this.value);
-        if (result.valid) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-            emailFeedback.style.display = 'none';
-        }
-    }
-});
-
-// Password validation
-const passwordInput = document.getElementById('password');
-const passwordFeedback = document.getElementById('passwordFeedback');
-
-function validatePassword(password) {
-    if (password.length < 8) {
-        return { valid: false, message: 'Password must be at least 8 characters' };
-    }
-    if (!/[A-Z]/.test(password)) {
-        return { valid: false, message: 'Password must contain at least one uppercase letter' };
-    }
-    if (!/[a-z]/.test(password)) {
-        return { valid: false, message: 'Password must contain at least one lowercase letter' };
-    }
-    if (!/[0-9]/.test(password)) {
-        return { valid: false, message: 'Password must contain at least one number' };
-    }
-    return { valid: true, message: '' };
-}
 
 passwordInput.addEventListener('blur', function() {
     const result = validatePassword(this.value);
     if (!result.valid && this.value.length > 0) {
         this.classList.add('is-invalid');
-        this.classList.remove('is-valid');
         passwordFeedback.textContent = result.message;
-        passwordFeedback.style.display = 'block';
-    } else if (this.value.length > 0) {
+    } else {
         this.classList.remove('is-invalid');
-        this.classList.add('is-valid');
-        passwordFeedback.style.display = 'none';
     }
 });
 
-passwordInput.addEventListener('input', function() {
-    if (this.classList.contains('is-invalid')) {
-        const result = validatePassword(this.value);
-        if (result.valid) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-            passwordFeedback.style.display = 'none';
-        }
-    }
-});
-
-const form = document.getElementById('registerForm');
-form.addEventListener('submit', function(e) {
+document.getElementById('registerForm').addEventListener('submit', function(e) {
     const emailResult = validateEmail(emailInput.value);
     const passwordResult = validatePassword(passwordInput.value);
     
@@ -193,17 +103,12 @@ form.addEventListener('submit', function(e) {
         e.preventDefault();
         emailInput.classList.add('is-invalid');
         emailFeedback.textContent = emailResult.message;
-        emailFeedback.style.display = 'block';
-        emailInput.focus();
         return;
     }
-    
     if (!passwordResult.valid) {
         e.preventDefault();
         passwordInput.classList.add('is-invalid');
         passwordFeedback.textContent = passwordResult.message;
-        passwordFeedback.style.display = 'block';
-        passwordInput.focus();
     }
 });
 </script>

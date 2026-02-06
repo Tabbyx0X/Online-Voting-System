@@ -1,179 +1,89 @@
 {% extends 'base.html' %}
 
-{% block title %}Votes for {{ election.title }} - Admin{% endblock %}
+{% block title %}Votes – {{ election.title }}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-list-ul"></i> Votes for: {{ election.title }}</h2>
     <div>
-        <a href="{{ url_for('view_results', election_id=election.id) }}" class="btn btn-success me-2">
-            <i class="fas fa-chart-bar"></i> View Results Chart
-        </a>
-        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
+        <h1 class="page-title">Votes</h1>
+        <span class="text-secondary small">{{ election.title }} • {{ votes|length }} votes</span>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('view_results', election_id=election.id) }}" class="btn btn-outline-secondary btn-sm">Results</a>
+        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
     </div>
 </div>
 
-<!-- Election Info Card -->
-<div class="card mb-4">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-8">
-                <h5 class="card-title">{{ election.title }}</h5>
-                <p class="card-text text-muted">{{ election.description }}</p>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="small text-secondary">Status</div>
+                <span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span>
             </div>
-            <div class="col-md-4 text-end">
-                <p class="mb-1">
-                    <strong>Status:</strong> 
-                    <span class="status-badge status-{{ election.status }}">
-                        {{ election.status|capitalize }}
-                    </span>
-                </p>
-                <p class="mb-1"><strong>Start:</strong> {{ election.start_date.strftime('%Y-%m-%d %H:%M') }}</p>
-                <p class="mb-0"><strong>End:</strong> {{ election.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="small text-secondary">Start</div>
+                <div>{{ election.start_date.strftime('%b %d, %H:%M') }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="small text-secondary">End</div>
+                <div>{{ election.end_date.strftime('%b %d, %H:%M') }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="small text-secondary">Total Votes</div>
+                <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">{{ votes|length }}</div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Votes Table -->
 <div class="card">
-    <div class="card-header bg-white">
-        <h5 class="mb-0">
-            <i class="fas fa-vote-yea"></i> Vote Details
-            <span class="badge bg-primary ms-2">{{ votes|length }} Votes</span>
-        </h5>
-    </div>
-    <div class="card-body">
+    <div class="card-body p-0">
         {% if votes %}
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>Voter ID</th>
-                            <th>Voter Name</th>
-                            <th>Voter Email</th>
-                            <th>Candidate Voted For</th>
-                            <th>Party</th>
-                            <th>Vote Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for vote_data in votes %}
-                        {% set vote = vote_data[0] %}
-                        {% set voter = vote_data[1] %}
-                        {% set candidate = vote_data[2] %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td><code>{{ voter.voter_id }}</code></td>
-                            <td><strong>{{ voter.name }}</strong></td>
-                            <td><small>{{ voter.email }}</small></td>
-                            <td>
-                                <strong>{{ candidate.name }}</strong>
-                                {% if candidate.photo_url %}
-                                <i class="fas fa-image text-muted ms-1" title="Has photo"></i>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if candidate.party %}
-                                    <span class="badge bg-secondary">{{ candidate.party }}</span>
-                                {% else %}
-                                    <span class="badge bg-light text-dark">Independent</span>
-                                {% endif %}
-                            </td>
-                            <td><small>{{ vote.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Vote Distribution Summary -->
-            <div class="row mt-4">
-                <div class="col-md-12">
-                    <h6 class="mb-3"><i class="fas fa-chart-pie"></i> Vote Distribution</h6>
-                    {% set candidate_votes = {} %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Voter</th>
+                        <th>Candidate</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
                     {% for vote_data in votes %}
-                        {% set candidate = vote_data[2] %}
-                        {% if candidate.name in candidate_votes %}
-                            {% set _ = candidate_votes.update({candidate.name: candidate_votes[candidate.name] + 1}) %}
-                        {% else %}
-                            {% set _ = candidate_votes.update({candidate.name: 1}) %}
-                        {% endif %}
+                    {% set vote = vote_data[0] %}
+                    {% set voter = vote_data[1] %}
+                    {% set candidate = vote_data[2] %}
+                    <tr>
+                        <td>
+                            <strong>{{ voter.name }}</strong>
+                            <span class="text-secondary d-block small">{{ voter.voter_id }}</span>
+                        </td>
+                        <td>
+                            <strong>{{ candidate.name }}</strong>
+                            {% if candidate.party %}<span class="text-secondary small d-block">{{ candidate.party }}</span>{% endif %}
+                        </td>
+                        <td class="text-secondary small">{{ vote.timestamp.strftime('%b %d, %H:%M') }}</td>
+                    </tr>
                     {% endfor %}
-                    
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Candidate</th>
-                                    <th>Votes Received</th>
-                                    <th>Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for candidate_name, count in candidate_votes.items() %}
-                                <tr>
-                                    <td><strong>{{ candidate_name }}</strong></td>
-                                    <td>{{ count }}</td>
-                                    <td>
-                                        {% set percentage = (count / votes|length * 100)|round(2) %}
-                                        <div class="progress">
-                                            <div class="progress-bar bg-success" role="progressbar" 
-                                                 style="width: {{ percentage }}%;" 
-                                                 aria-valuenow="{{ percentage }}" 
-                                                 aria-valuemin="0" 
-                                                 aria-valuemax="100">
-                                                {{ percentage }}%
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Summary Alert -->
-            <div class="alert alert-info mt-3">
-                <i class="fas fa-info-circle"></i> 
-                <strong>Summary:</strong> Total of <strong>{{ votes|length }}</strong> votes cast in this election.
-            </div>
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <div class="text-center py-5">
-                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                <p class="text-muted">No votes have been cast for this election yet.</p>
-                <a href="{{ url_for('manage_candidates', election_id=election.id) }}" class="btn btn-info">
-                    <i class="fas fa-users"></i> Manage Candidates
-                </a>
-            </div>
+        <div class="text-center py-5 text-muted">No votes cast yet</div>
         {% endif %}
     </div>
 </div>
-
-<style>
-    .table td, .table th {
-        vertical-align: middle;
-    }
-    
-    code {
-        background-color: #f8f9fa;
-        padding: 2px 6px;
-        border-radius: 3px;
-        color: #d63384;
-    }
-    
-    .progress {
-        height: 25px;
-    }
-    
-    .progress-bar {
-        font-size: 14px;
-        line-height: 25px;
-    }
-</style>
 {% endblock %}

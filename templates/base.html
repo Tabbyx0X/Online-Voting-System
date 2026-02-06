@@ -3,137 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Online Voting System{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" crossorigin="anonymous">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <title>{% block title %}Voting System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
     <style>
         :root {
-            --primary-color: #2563eb;
-            --secondary-color: #475569;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --border-color: #e5e7eb;
+            --accent: #4f46e5;
+            --accent-hover: #4338ca;
         }
         
+        * { box-sizing: border-box; }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
         
         .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #1e40af 100%);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 0;
         }
         
         .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--text-primary) !important;
         }
+        
+        .nav-link {
+            color: var(--text-secondary) !important;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+        }
+        
+        .nav-link:hover { color: var(--text-primary) !important; }
         
         .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: transform 0.3s, box-shadow 0.3s;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
         
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.25rem;
+        }
+        
+        .card-body { padding: 1.25rem; }
+        
+        .card-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn {
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
         }
         
         .btn-primary {
-            background-color: var(--primary-color);
+            background: var(--accent);
             border: none;
         }
         
-        .btn-primary:hover {
-            background-color: #1e40af;
+        .btn-primary:hover { background: var(--accent-hover); }
+        
+        .btn-outline-secondary {
+            border-color: var(--border-color);
+            color: var(--text-secondary);
         }
         
-        .status-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+        .btn-outline-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .form-control, .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.625rem 0.875rem;
             font-size: 0.875rem;
-            font-weight: 600;
         }
         
-        .status-upcoming {
-            background-color: #fef3c7;
-            color: #92400e;
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
         
-        .status-active {
-            background-color: #d1fae5;
-            color: #065f46;
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.375rem;
         }
         
-        .status-completed {
-            background-color: #e5e7eb;
-            color: #374151;
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
         }
         
-        footer {
-            background-color: #1e293b;
-            color: white;
-            margin-top: 4rem;
-        }
+        .badge-upcoming { background: #fef3c7; color: #92400e; }
+        .badge-active { background: #d1fae5; color: #065f46; }
+        .badge-completed { background: #f3f4f6; color: #374151; }
         
-        /* Mobile Responsive Fixes */
-        @media (max-width: 576px) {
-            .navbar-brand {
-                font-size: 1.1rem;
-            }
-            
-            .display-5 {
-                font-size: 1.75rem;
-            }
-            
-            .btn-lg {
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
-            }
-            
-            .jumbotron {
-                padding: 1.5rem !important;
-            }
-            
-            .card-body {
-                padding: 1rem;
-            }
-            
-            .status-badge {
-                padding: 0.35rem 0.7rem;
-                font-size: 0.75rem;
-            }
-            
-            h2 {
-                font-size: 1.5rem;
-            }
-            
-            .container {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-        }
+        .status-badge { padding: 0.25rem 0.625rem; font-size: 0.75rem; font-weight: 500; border-radius: 9999px; }
+        .status-upcoming { background: #fef3c7; color: #92400e; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-completed { background: #f3f4f6; color: #374151; }
+        
+        .stat-card { padding: 1.25rem; }
+        .stat-value { font-size: 1.875rem; font-weight: 600; color: var(--text-primary); line-height: 1; }
+        .stat-label { font-size: 0.75rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem; }
+        
+        .table { font-size: 0.875rem; }
+        .table th { font-weight: 500; color: var(--text-secondary); border-bottom-width: 1px; padding: 0.75rem 1rem; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        .table td { padding: 0.875rem 1rem; vertical-align: middle; border-bottom: 1px solid var(--border-color); }
+        .table tbody tr:hover { background: var(--bg-secondary); }
+        
+        .alert { border: none; border-radius: 6px; font-size: 0.875rem; padding: 0.875rem 1rem; }
+        
+        .page-header { margin-bottom: 1.5rem; }
+        .page-title { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); margin: 0; }
+        .page-subtitle { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        
+        .text-muted { color: var(--text-muted) !important; }
+        .text-secondary { color: var(--text-secondary) !important; }
+        
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { color: var(--accent-hover); }
+        
+        main .container { max-width: 1140px; }
         
         @media (max-width: 768px) {
-            .card:hover {
-                transform: none;
-            }
+            .page-title { font-size: 1.25rem; }
+            .stat-value { font-size: 1.5rem; }
         }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="fas fa-vote-yea"></i> Online Voting System
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand" href="{{ url_for('index') }}">VoteSystem</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -143,17 +176,17 @@
                     </li>
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+                            <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                            <a class="nav-link" href="{{ url_for('logout') }}">Sign Out</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('voter_login') }}">Voter Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('voter_register') }}">Voter Register</a>
+                            <a class="nav-link" href="{{ url_for('voter_register') }}">Register</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -162,11 +195,11 @@
     </nav>
 
     <main>
-        <div class="container mt-4">
+        <div class="container py-4">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <div class="alert alert-{{ category }} alert-dismissible fade show mb-4" role="alert">
                             {{ message }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
@@ -177,12 +210,6 @@
             {% block content %}{% endblock %}
         </div>
     </main>
-
-    <!-- <footer class="py-4 mt-5">
-        <div class="container text-center">
-            <p class="mb-0">&copy; 2024 Online Voting System. All rights reserved.</p>
-        </div>
-    </footer> -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
     {% block charts %}{% endblock %}

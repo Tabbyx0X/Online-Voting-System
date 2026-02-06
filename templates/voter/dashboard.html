@@ -1,88 +1,64 @@
 {% extends 'base.html' %}
 
-{% block title %}Voter Dashboard{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2><i class="fas fa-tachometer-alt"></i> Voter Dashboard</h2>
-        <p class="text-muted mb-0">Welcome, <strong>{{ voter.name }}</strong>!</p>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Welcome back, {{ voter.name }}</p>
     </div>
-    <a href="{{ url_for('voter_logout') }}" class="btn btn-outline-danger">
-        <i class="fas fa-sign-out-alt"></i> Logout
-    </a>
+    <a href="{{ url_for('voter_logout') }}" class="btn btn-outline-secondary btn-sm">Sign Out</a>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
-        <div class="card bg-info text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-subtitle mb-2 text-white-50">Your Voter ID</h6>
-                        <h4 class="mb-0">{{ voter.voter_id }}</h4>
-                    </div>
-                    <i class="fas fa-id-card fa-3x opacity-50"></i>
-                </div>
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="stat-card">
+                <div class="stat-label">Voter ID</div>
+                <div class="stat-value" style="font-size: 1.25rem;">{{ voter.voter_id }}</div>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card bg-success text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-subtitle mb-2 text-white-50">Active Elections</h6>
-                        <h2 class="mb-0">{{ elections|length }}</h2>
-                    </div>
-                    <i class="fas fa-vote-yea fa-3x opacity-50"></i>
-                </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="stat-card">
+                <div class="stat-label">Active Elections</div>
+                <div class="stat-value">{{ elections|length }}</div>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card bg-warning text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-subtitle mb-2 text-white-50">Your Votes</h6>
-                        <h2 class="mb-0">{{ voter.votes|length }}</h2>
-                    </div>
-                    <i class="fas fa-check-circle fa-3x opacity-50"></i>
-                </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="stat-card">
+                <div class="stat-label">Votes Cast</div>
+                <div class="stat-value">{{ voter.votes|length }}</div>
             </div>
         </div>
     </div>
 </div>
 
 <div class="card">
-    <div class="card-header bg-white">
-        <h5 class="mb-0"><i class="fas fa-ballot"></i> Active Elections</h5>
+    <div class="card-header">
+        <h2 class="h6 mb-0">Active Elections</h2>
     </div>
     <div class="card-body">
         {% if elections %}
-            <div class="row">
+            <div class="row g-3">
                 {% for election in elections %}
-                <div class="col-md-6 mb-3">
+                <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">{{ election.title }}</h5>
-                            <p class="card-text text-muted">{{ election.description }}</p>
-                            <div class="mb-3">
-                                <p class="mb-1 small"><i class="fas fa-calendar"></i> <strong>Ends:</strong> {{ election.end_date.strftime('%Y-%m-%d %H:%M') }}</p>
-                                <p class="mb-0 small"><i class="fas fa-users"></i> <strong>Candidates:</strong> {{ election.candidates|length }}</p>
+                            <h3 class="h6 mb-2">{{ election.title }}</h3>
+                            <p class="text-secondary small mb-3">{{ election.description or 'No description' }}</p>
+                            <div class="small text-muted mb-3">
+                                <div>Ends: {{ election.end_date.strftime('%b %d, %Y %H:%M') }}</div>
+                                <div>{{ election.candidates|length }} candidates</div>
                             </div>
-                            
                             {% if voter.has_voted(election.id) %}
-                                <button class="btn btn-success w-100" disabled>
-                                    <i class="fas fa-check-circle"></i> Already Voted
-                                </button>
+                                <button class="btn btn-outline-secondary btn-sm w-100" disabled>Voted</button>
                             {% else %}
-                                <a href="{{ url_for('vote', election_id=election.id) }}" class="btn btn-primary w-100">
-                                    <i class="fas fa-vote-yea"></i> Cast Your Vote
-                                </a>
+                                <a href="{{ url_for('vote', election_id=election.id) }}" class="btn btn-primary btn-sm w-100">Cast Vote</a>
                             {% endif %}
                         </div>
                     </div>
@@ -90,8 +66,8 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div class="alert alert-info text-center">
-                <i class="fas fa-info-circle"></i> No active elections at the moment. Check back later!
+            <div class="text-center py-4 text-muted">
+                No active elections at the moment
             </div>
         {% endif %}
     </div>

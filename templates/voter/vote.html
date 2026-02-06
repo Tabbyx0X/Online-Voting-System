@@ -1,98 +1,74 @@
 {% extends 'base.html' %}
 
-{% block title %}Cast Your Vote - {{ election.title }}{% endblock %}
+{% block title %}Vote - {{ election.title }}{% endblock %}
 
 {% block extra_css %}
 <style>
-    .candidate-card {
+    .candidate-option {
         cursor: pointer;
-        transition: all 0.3s;
-        border: 2px solid transparent;
+        border: 2px solid var(--border-color);
+        transition: border-color 0.15s, background-color 0.15s;
     }
-    
-    .candidate-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    .candidate-option:hover {
+        border-color: var(--accent);
     }
-    
-    .candidate-card.selected {
-        border-color: #2563eb;
-        background-color: #eff6ff;
+    .candidate-option.selected {
+        border-color: var(--accent);
+        background-color: #f5f3ff;
     }
-    
-    .candidate-radio {
-        transform: scale(1.5);
-        margin-right: 10px;
+    .candidate-option input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--accent);
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-10">
+    <div class="col-md-8">
+        <div class="mb-4">
+            <a href="{{ url_for('voter_dashboard') }}" class="text-secondary small">← Back to dashboard</a>
+        </div>
+        
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fas fa-vote-yea"></i> Cast Your Vote</h4>
-            </div>
             <div class="card-body">
-                <h5>{{ election.title }}</h5>
-                <p class="text-muted">{{ election.description }}</p>
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i> 
-                    <strong>Important:</strong> You can only vote once in this election. Choose carefully!
+                <h1 class="h4 mb-2">{{ election.title }}</h1>
+                <p class="text-secondary mb-3">{{ election.description or 'Select a candidate to cast your vote' }}</p>
+                <div class="alert alert-warning small mb-0">
+                    <strong>Note:</strong> You can only vote once. Your choice cannot be changed after submission.
                 </div>
             </div>
         </div>
         
         <form method="POST" id="voteForm">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <div class="row">
+            
+            <div class="d-flex flex-column gap-3 mb-4">
                 {% for candidate in candidates %}
-                <div class="col-md-6 mb-4">
-                    <div class="card candidate-card h-100" onclick="selectCandidate({{ candidate.id }})">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start">
-                                <input type="radio" name="candidate_id" value="{{ candidate.id }}" 
-                                       id="candidate_{{ candidate.id }}" class="candidate-radio" required>
-                                
-                                <div class="flex-grow-1">
-                                    {% if candidate.photo_url %}
-                                    <div class="text-center mb-3">
-                                        <img src="{{ candidate.photo_url }}" alt="{{ candidate.name }}" 
-                                             class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
-                                    </div>
-                                    {% else %}
-                                    <div class="text-center mb-3">
-                                        <i class="fas fa-user-circle fa-4x text-secondary"></i>
-                                    </div>
-                                    {% endif %}
-                                    
-                                    <h5 class="card-title text-center">{{ candidate.name }}</h5>
-                                    
-                                    {% if candidate.party %}
-                                    <p class="text-center text-muted mb-2">
-                                        <i class="fas fa-flag"></i> {{ candidate.party }}
-                                    </p>
-                                    {% endif %}
-                                    
-                                    {% if candidate.description %}
-                                    <p class="card-text small">{{ candidate.description }}</p>
-                                    {% endif %}
-                                </div>
-                            </div>
+                <label class="card candidate-option" for="candidate_{{ candidate.id }}">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <input type="radio" name="candidate_id" value="{{ candidate.id }}" 
+                               id="candidate_{{ candidate.id }}" required>
+                        <div class="flex-grow-1">
+                            <div class="fw-medium">{{ candidate.name }}</div>
+                            {% if candidate.party %}
+                            <div class="small text-muted">{{ candidate.party }}</div>
+                            {% endif %}
+                            {% if candidate.description %}
+                            <div class="small text-secondary mt-1">{{ candidate.description }}</div>
+                            {% endif %}
                         </div>
                     </div>
-                </div>
+                </label>
                 {% endfor %}
             </div>
             
-            <div class="d-flex justify-content-between mt-4">
-                <a href="{{ url_for('voter_dashboard') }}" class="btn btn-secondary btn-lg">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
-                <button type="submit" class="btn btn-primary btn-lg" 
-                        onclick="return confirm('Are you sure you want to submit your vote? This action cannot be undone.');">
-                    <i class="fas fa-check-circle"></i> Submit Vote
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{{ url_for('voter_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary" 
+                        onclick="return confirm('Submit your vote? This cannot be undone.');">
+                    Submit Vote
                 </button>
             </div>
         </form>
@@ -100,30 +76,21 @@
 </div>
 
 <script>
-    function selectCandidate(candidateId) {
-        // Remove selected class from all cards
-        document.querySelectorAll('.candidate-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-        
-        // Select the radio button
-        const radio = document.getElementById('candidate_' + candidateId);
-        radio.checked = true;
-        
-        // Add selected class to the clicked card
-        radio.closest('.candidate-card').classList.add('selected');
-    }
-    
-    // Add selected class on page load if a radio is checked
-    document.querySelectorAll('input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            document.querySelectorAll('.candidate-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            if (this.checked) {
-                this.closest('.candidate-card').classList.add('selected');
-            }
-        });
+document.querySelectorAll('.candidate-option').forEach(card => {
+    card.addEventListener('click', function(e) {
+        if (e.target.type !== 'radio') {
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change'));
+        }
     });
+});
+
+document.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.querySelectorAll('.candidate-option').forEach(c => c.classList.remove('selected'));
+        if (this.checked) this.closest('.candidate-option').classList.add('selected');
+    });
+});
 </script>
 {% endblock %}
