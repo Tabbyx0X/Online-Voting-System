@@ -225,24 +225,21 @@ def send_admin_access_email(email, token, base_url):
         msg = MIMEMultipart()
         msg['From'] = Config.MAIL_USERNAME
         msg['To'] = email
-        msg['Subject'] = 'Admin Access Link - Online Voting System'
+        msg['Subject'] = 'Admin Access Verification - Voting System'
         
         body = f"""
         <html>
-        <body style="font-family: Arial, sans-serif; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 30px; border-radius: 10px;">
-                <h2 style="color: #2563eb;">🔐 Admin Access Request</h2>
-                <p>You requested access to the Admin Login page.</p>
-                <p>Click the button below to access the admin login:</p>
-                <p style="text-align: center; margin: 30px 0;">
-                    <a href="{access_link}" style="background: #2563eb; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                        Access Admin Login
-                    </a>
-                </p>
-                <p style="color: #666; font-size: 14px;">This link expires in 10 minutes.</p>
-                <p style="color: #666; font-size: 14px;">If you didn't request this, please ignore this email.</p>
-                <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-                <p style="color: #999; font-size: 12px;">Online Voting System</p>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; padding: 40px 20px;">
+            <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                <div style="padding: 32px;">
+                    <h1 style="font-size: 20px; font-weight: 600; color: #111827; margin: 0 0 16px 0;">Admin Access Request</h1>
+                    <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin: 0 0 24px 0;">You requested access to the admin panel. Click the button below to verify your identity and proceed to login.</p>
+                    <a href="{access_link}" style="display: inline-block; background: #4f46e5; color: #ffffff; font-size: 14px; font-weight: 500; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Verify Access</a>
+                    <p style="font-size: 13px; color: #9ca3af; margin: 24px 0 0 0;">This link expires in 10 minutes. If you didn't request this, you can safely ignore this email.</p>
+                </div>
+                <div style="background: #f9fafb; border-top: 1px solid #e5e7eb; padding: 16px 32px;">
+                    <p style="font-size: 12px; color: #9ca3af; margin: 0;">Voting System</p>
+                </div>
             </div>
         </body>
         </html>
@@ -269,24 +266,21 @@ def send_password_reset_email(email, token, base_url):
         msg = MIMEMultipart()
         msg['From'] = Config.MAIL_USERNAME
         msg['To'] = email
-        msg['Subject'] = 'Password Reset - Online Voting System'
+        msg['Subject'] = 'Reset Your Password - Voting System'
         
         body = f"""
         <html>
-        <body style="font-family: Arial, sans-serif; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 30px; border-radius: 10px;">
-                <h2 style="color: #2563eb;">🔑 Password Reset Request</h2>
-                <p>You requested to reset your password.</p>
-                <p>Click the button below to set a new password:</p>
-                <p style="text-align: center; margin: 30px 0;">
-                    <a href="{reset_link}" style="background: #2563eb; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
-                        Reset Password
-                    </a>
-                </p>
-                <p style="color: #666; font-size: 14px;">This link expires in 15 minutes.</p>
-                <p style="color: #666; font-size: 14px;">If you didn't request this, please ignore this email.</p>
-                <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-                <p style="color: #999; font-size: 12px;">Online Voting System</p>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f9fafb; padding: 40px 20px;">
+            <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                <div style="padding: 32px;">
+                    <h1 style="font-size: 20px; font-weight: 600; color: #111827; margin: 0 0 16px 0;">Password Reset</h1>
+                    <p style="font-size: 14px; color: #6b7280; line-height: 1.6; margin: 0 0 24px 0;">We received a request to reset your password. Click the button below to create a new password.</p>
+                    <a href="{reset_link}" style="display: inline-block; background: #4f46e5; color: #ffffff; font-size: 14px; font-weight: 500; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Reset Password</a>
+                    <p style="font-size: 13px; color: #9ca3af; margin: 24px 0 0 0;">This link expires in 15 minutes. If you didn't request a password reset, you can safely ignore this email.</p>
+                </div>
+                <div style="background: #f9fafb; border-top: 1px solid #e5e7eb; padding: 16px 32px;">
+                    <p style="font-size: 12px; color: #9ca3af; margin: 0;">Voting System</p>
+                </div>
             </div>
         </body>
         </html>
