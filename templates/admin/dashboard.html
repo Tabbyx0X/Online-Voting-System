@@ -70,7 +70,7 @@
                     <tr class="fade-in">
                         <td>
                             <div class="fw-medium">{{ election.title }}</div>
-                            <small class="text-muted">{{ election.description[:50] }}{% if election.description|length > 50 %}...{% endif %}</small>
+                            <small class="text-muted">{{ (election.description or '')[:50] }}{% if election.description and election.description|length > 50 %}...{% endif %}</small>
                         </td>
                         <td>
                             <div class="small">{{ election.start_date.strftime('%b %d, %Y') }}</div>
