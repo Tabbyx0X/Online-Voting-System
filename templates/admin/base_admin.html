@@ -32,7 +32,7 @@
                     <i class="fas fa-box"></i>
                     Elections
                 </a>
-                <a href="{{ url_for('admin_voters') }}" class="sidebar-nav-item {% if request.endpoint and 'voter' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('manage_voters') }}" class="sidebar-nav-item {% if request.endpoint and 'voter' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-users"></i>
                     Voters
                 </a>
