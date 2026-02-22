@@ -1,14 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
 {% block title %}All Votes{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="page-title">All Votes</h1>
-        <span class="text-secondary small">{{ votes|length }} total votes</span>
-    </div>
-    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+<div class="page-header">
+    <h1 class="page-title">Vote History</h1>
+    <p class="page-subtitle">{{ votes|length }} total votes across all elections</p>
 </div>
 
 <div class="card">
@@ -33,21 +30,24 @@
                     <tr>
                         <td>
                             <strong>{{ voter.name }}</strong>
-                            <span class="text-secondary d-block small">{{ voter.voter_id }}</span>
+                            <span class="text-muted d-block small">{{ voter.voter_id }}</span>
                         </td>
                         <td>{{ election.title }}</td>
                         <td>
                             <strong>{{ candidate.name }}</strong>
-                            {% if candidate.party %}<span class="text-secondary small d-block">{{ candidate.party }}</span>{% endif %}
+                            {% if candidate.party %}<span class="text-muted small d-block">{{ candidate.party }}</span>{% endif %}
                         </td>
-                        <td class="text-secondary small">{{ vote.timestamp.strftime('%b %d, %H:%M') }}</td>
+                        <td class="text-muted small">{{ vote.timestamp.strftime('%b %d, %H:%M') }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="text-center py-5 text-muted">No votes cast yet</div>
+        <div class="empty-state">
+            <i class="fas fa-vote-yea"></i>
+            <p>No votes have been cast yet</p>
+        </div>
         {% endif %}
     </div>
 </div>

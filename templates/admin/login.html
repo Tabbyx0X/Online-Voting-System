@@ -2,31 +2,65 @@
 
 {% block title %}Admin Login{% endblock %}
 
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5 col-lg-4">
-        <div class="card">
-            <div class="card-body p-4">
-                <div class="mb-4">
-                    <h1 class="h4 mb-1">Admin Login</h1>
-                    <p class="text-secondary small mb-0">Sign in to manage elections</p>
+{% block extra_css %}
+<style>
+    body { 
+        background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+        min-height: 100vh;
+    }
+    .voter-navbar { display: none; }
+</style>
+{% endblock %}
+
+{% block layout %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center p-4">
+    <div class="login-card fade-in">
+        <div class="login-header">
+            <div class="mb-3">
+                <i class="fas fa-shield-alt fa-2x"></i>
+            </div>
+            <h2>Admin Portal</h2>
+            <p>Online Voting System</p>
+        </div>
+        <div class="login-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} mb-3">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent"><i class="fas fa-user text-muted"></i></span>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                    </div>
                 </div>
                 
-                <form method="POST">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent"><i class="fas fa-lock text-muted"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
                     </div>
-                    
-                    <div class="mb-4">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary w-100">Sign In</button>
-                </form>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                    <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                </button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('index') }}" class="text-muted small">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Home
+                </a>
             </div>
         </div>
     </div>

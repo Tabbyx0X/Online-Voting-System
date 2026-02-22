@@ -1,252 +1,253 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
 {% block title %}Database Viewer{% endblock %}
 
+{% block extra_css %}
+<style>
+    .db-card { margin-bottom: 1.5rem; }
+    .db-card .card-header {
+        padding: 0.875rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    .db-card .card-header i { margin-right: 0.5rem; }
+    .db-card .badge { font-size: 0.75rem; }
+    .table-sm td, .table-sm th { padding: 0.5rem 0.75rem; font-size: 0.8125rem; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-database"></i> Live Database Viewer</h2>
-        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
-    </div>
+<div class="page-header">
+    <h1 class="page-title">Database Viewer</h1>
+    <p class="page-subtitle">Live view of all database records</p>
+</div>
 
-    <!-- Colleges Table -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="fas fa-university"></i> Colleges ({{ colleges|length }})</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-sm">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>College Code</th>
-                            <th>College Name</th>
-                            <th>Created At</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for college in colleges %}
-                        <tr>
-                            <td>{{ college.id }}</td>
-                            <td><span class="badge bg-primary">{{ college.college_code }}</span></td>
-                            <td>{{ college.college_name }}</td>
-                            <td>{{ college.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="4" class="text-center text-muted">No records</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<!-- Colleges Table -->
+<div class="card db-card">
+    <div class="card-header" style="background: var(--primary); color: white;">
+        <i class="fas fa-university"></i>Colleges <span class="badge bg-light text-dark ms-2">{{ colleges|length }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for college in colleges %}
+                    <tr>
+                        <td>{{ college.id }}</td>
+                        <td><code>{{ college.college_code }}</code></td>
+                        <td>{{ college.college_name }}</td>
+                        <td class="text-muted">{{ college.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-center text-muted py-3">No records</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- Admins/Teachers Table -->
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="fas fa-user-shield"></i> Admins & Teachers ({{ admins|length }})</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-sm">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>College Code</th>
-                            <th>Created At</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for admin in admins %}
-                        <tr>
-                            <td>{{ admin.id }}</td>
-                            <td>{{ admin.username }}</td>
-                            <td>{{ admin.email }}</td>
-                            <td>
-                                {% if admin.role == 'admin' %}
-                                <span class="badge bg-danger">Admin</span>
-                                {% else %}
-                                <span class="badge bg-info">Teacher</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ admin.college_code or 'N/A' }}</td>
-                            <td>{{ admin.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="6" class="text-center text-muted">No records</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<!-- Admins/Teachers Table -->
+<div class="card db-card">
+    <div class="card-header" style="background: var(--accent); color: white;">
+        <i class="fas fa-user-shield"></i>Admins & Teachers <span class="badge bg-light text-dark ms-2">{{ admins|length }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>College</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for admin in admins %}
+                    <tr>
+                        <td>{{ admin.id }}</td>
+                        <td><strong>{{ admin.username }}</strong></td>
+                        <td>{{ admin.email }}</td>
+                        <td>
+                            {% if admin.role == 'admin' %}
+                            <span class="status-badge status-completed">Admin</span>
+                            {% else %}
+                            <span class="status-badge status-active">Teacher</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ admin.college_code or '—' }}</td>
+                        <td class="text-muted">{{ admin.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted py-3">No records</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- Voters Table -->
-    <div class="card mb-4">
-        <div class="card-header bg-info text-white">
-            <h5 class="mb-0"><i class="fas fa-users"></i> Voters ({{ voters|length }})</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-sm">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Voter ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>College Code</th>
-                            <th>Created At</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for voter in voters %}
-                        <tr>
-                            <td>{{ voter.id }}</td>
-                            <td><strong>{{ voter.voter_id }}</strong></td>
-                            <td>{{ voter.name }}</td>
-                            <td>{{ voter.email }}</td>
-                            <td><span class="badge bg-secondary">{{ voter.college_code }}</span></td>
-                            <td>{{ voter.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="6" class="text-center text-muted">No records</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<!-- Voters Table -->
+<div class="card db-card">
+    <div class="card-header" style="background: #0ea5e9; color: white;">
+        <i class="fas fa-users"></i>Voters <span class="badge bg-light text-dark ms-2">{{ voters|length }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Voter ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>College</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for voter in voters %}
+                    <tr>
+                        <td>{{ voter.id }}</td>
+                        <td><code>{{ voter.voter_id }}</code></td>
+                        <td><strong>{{ voter.name }}</strong></td>
+                        <td>{{ voter.email }}</td>
+                        <td>{{ voter.college_code }}</td>
+                        <td class="text-muted">{{ voter.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted py-3">No records</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- Elections Table -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Elections ({{ elections|length }})</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-sm">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Title</th>
-                            <th>College Code</th>
-                            <th>Status</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Created By</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for election in elections %}
-                        <tr>
-                            <td>{{ election.id }}</td>
-                            <td>{{ election.title }}</td>
-                            <td><span class="badge bg-secondary">{{ election.college_code }}</span></td>
-                            <td>
-                                {% if election.status == 'active' %}
-                                <span class="badge bg-success">Active</span>
-                                {% elif election.status == 'completed' %}
-                                <span class="badge bg-secondary">Completed</span>
-                                {% else %}
-                                <span class="badge bg-primary">Upcoming</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ election.start_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                            <td>{{ election.end_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                            <td>{{ election.creator.username }}</td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="7" class="text-center text-muted">No records</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<!-- Elections Table -->
+<div class="card db-card">
+    <div class="card-header" style="background: #f59e0b; color: white;">
+        <i class="fas fa-calendar-alt"></i>Elections <span class="badge bg-light text-dark ms-2">{{ elections|length }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>College</th>
+                        <th>Status</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Created By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for election in elections %}
+                    <tr>
+                        <td>{{ election.id }}</td>
+                        <td><strong>{{ election.title }}</strong></td>
+                        <td>{{ election.college_code }}</td>
+                        <td><span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span></td>
+                        <td class="text-muted">{{ election.start_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="text-muted">{{ election.end_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ election.creator.username }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="text-center text-muted py-3">No records</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- Candidates Table -->
-    <div class="card mb-4">
-        <div class="card-header bg-secondary text-white">
-            <h5 class="mb-0"><i class="fas fa-user-tie"></i> Candidates ({{ candidates|length }})</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-sm">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Party</th>
-                            <th>Election ID</th>
-                            <th>Election Title</th>
-                            <th>Vote Count</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for candidate in candidates %}
-                        <tr>
-                            <td>{{ candidate.id }}</td>
-                            <td><strong>{{ candidate.name }}</strong></td>
-                            <td>{{ candidate.party or 'N/A' }}</td>
-                            <td>{{ candidate.election_id }}</td>
-                            <td>{{ candidate.election.title }}</td>
-                            <td><span class="badge bg-primary">{{ candidate.get_vote_count() }}</span></td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="6" class="text-center text-muted">No records</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<!-- Candidates Table -->
+<div class="card db-card">
+    <div class="card-header" style="background: #8b5cf6; color: white;">
+        <i class="fas fa-user-tie"></i>Candidates <span class="badge bg-light text-dark ms-2">{{ candidates|length }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Party</th>
+                        <th>Election</th>
+                        <th>Votes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for candidate in candidates %}
+                    <tr>
+                        <td>{{ candidate.id }}</td>
+                        <td><strong>{{ candidate.name }}</strong></td>
+                        <td>{{ candidate.party or '—' }}</td>
+                        <td>{{ candidate.election.title }}</td>
+                        <td><span class="badge bg-primary">{{ candidate.get_vote_count() }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center text-muted py-3">No records</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <!-- Votes Table -->
-    <div class="card mb-4">
-        <div class="card-header bg-danger text-white">
-            <h5 class="mb-0"><i class="fas fa-vote-yea"></i> Votes ({{ votes|length }})</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-sm">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Vote ID</th>
-                            <th>Voter Name</th>
-                            <th>Voter ID</th>
-                            <th>Election</th>
-                            <th>Candidate</th>
-                            <th>Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for vote in votes %}
-                        <tr>
-                            <td>{{ vote.id }}</td>
-                            <td>{{ vote.voter.name }}</td>
-                            <td><strong>{{ vote.voter.voter_id }}</strong></td>
-                            <td>{{ vote.election.title }}</td>
-                            <td><span class="badge bg-success">{{ vote.candidate.name }}</span></td>
-                            <td>{{ vote.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="6" class="text-center text-muted">No records</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<!-- Votes Table -->
+<div class="card db-card">
+    <div class="card-header" style="background: #ef4444; color: white;">
+        <i class="fas fa-vote-yea"></i>Votes <span class="badge bg-light text-dark ms-2">{{ votes|length }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Voter</th>
+                        <th>Voter ID</th>
+                        <th>Election</th>
+                        <th>Candidate</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vote in votes %}
+                    <tr>
+                        <td>{{ vote.id }}</td>
+                        <td>{{ vote.voter.name }}</td>
+                        <td><code>{{ vote.voter.voter_id }}</code></td>
+                        <td>{{ vote.election.title }}</td>
+                        <td><strong>{{ vote.candidate.name }}</strong></td>
+                        <td class="text-muted">{{ vote.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted py-3">No records</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i> <strong>Note:</strong> This page shows all database records in real-time. Refresh the page to see the latest data.
-    </div>
+<div class="alert alert-info d-flex align-items-center">
+    <i class="fas fa-info-circle me-2"></i>
+    <span>This page displays live database records. Refresh to see the latest data.</span>
 </div>
 {% endblock %}

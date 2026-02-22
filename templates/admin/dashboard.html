@@ -1,97 +1,120 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-header">
     <h1 class="page-title">Dashboard</h1>
-    <div class="d-flex gap-2">
-        <a href="{{ url_for('manage_voters') }}" class="btn btn-outline-secondary btn-sm">Voters</a>
-        <a href="{{ url_for('view_database') }}" class="btn btn-outline-secondary btn-sm">Database</a>
-        <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary btn-sm">Sign Out</a>
-    </div>
+    <p class="page-subtitle">Welcome back, {{ current_user.username }}</p>
 </div>
 
+<!-- Stats Grid -->
 <div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
+    <div class="col-sm-6 col-lg-3">
         <div class="card">
             <div class="stat-card">
-                <div class="stat-label">Elections</div>
+                <div class="stat-label">Total Elections</div>
                 <div class="stat-value">{{ total_elections }}</div>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-sm-6 col-lg-3">
         <div class="card">
-            <div class="stat-card">
+            <div class="stat-card accent">
                 <div class="stat-label">Candidates</div>
                 <div class="stat-value">{{ total_candidates }}</div>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-sm-6 col-lg-3">
         <div class="card">
-            <div class="stat-card">
-                <div class="stat-label">Voters</div>
+            <div class="stat-card warning">
+                <div class="stat-label">Registered Voters</div>
                 <div class="stat-value">{{ total_voters }}</div>
             </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
+    <div class="col-sm-6 col-lg-3">
         <div class="card">
-            <div class="stat-card">
-                <div class="stat-label">Total Votes</div>
+            <div class="stat-card danger">
+                <div class="stat-label">Votes Cast</div>
                 <div class="stat-value">{{ total_votes }}</div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Elections Table -->
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h2 class="h6 mb-0">Elections</h2>
-        <a href="{{ url_for('add_election') }}" class="btn btn-primary btn-sm">New Election</a>
+        <span>Recent Elections</span>
+        <a href="{{ url_for('add_election') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i> New Election
+        </a>
     </div>
     <div class="card-body p-0">
         {% if elections %}
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Status</th>
-                            <th>Candidates</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for election in elections %}
-                        <tr>
-                            <td><strong>{{ election.title }}</strong></td>
-                            <td>{{ election.start_date.strftime('%b %d, %Y') }}</td>
-                            <td>{{ election.end_date.strftime('%b %d, %Y') }}</td>
-                            <td><span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span></td>
-                            <td>{{ election.candidates|length }}</td>
-                            <td class="text-end">
-                                <a href="{{ url_for('manage_candidates', election_id=election.id) }}" class="btn btn-sm btn-outline-secondary" title="Candidates">Candidates</a>
-                                <a href="{{ url_for('view_results', election_id=election.id) }}" class="btn btn-sm btn-outline-secondary" title="Results">Results</a>
-                                <a href="{{ url_for('edit_election', election_id=election.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit">Edit</a>
-                                <form method="POST" action="{{ url_for('delete_election', election_id=election.id) }}" class="d-inline" onsubmit="return confirm('Delete this election?');">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Election</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Candidates</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for election in elections %}
+                    <tr class="fade-in">
+                        <td>
+                            <div class="fw-medium">{{ election.title }}</div>
+                            <small class="text-muted">{{ election.description[:50] }}{% if election.description|length > 50 %}...{% endif %}</small>
+                        </td>
+                        <td>
+                            <div class="small">{{ election.start_date.strftime('%b %d, %Y') }}</div>
+                            <div class="small text-muted">to {{ election.end_date.strftime('%b %d, %Y') }}</div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-primary">{{ election.candidates|length }}</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('manage_candidates', election_id=election.id) }}" class="btn btn-outline-secondary" title="Manage Candidates">
+                                    <i class="fas fa-users"></i>
+                                </a>
+                                <a href="{{ url_for('view_results', election_id=election.id) }}" class="btn btn-outline-secondary" title="View Results">
+                                    <i class="fas fa-chart-bar"></i>
+                                </a>
+                                <a href="{{ url_for('edit_election', election_id=election.id) }}" class="btn btn-outline-secondary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('delete_election', election_id=election.id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this election?');">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary text-danger" title="Delete">Delete</button>
+                                    <button type="submit" class="btn btn-outline-secondary text-danger" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
                                 </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <div class="text-center py-5 text-muted">
-                No elections yet. Create your first election to get started.
-            </div>
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-box-open"></i></div>
+            <div class="empty-state-title">No Elections Yet</div>
+            <p class="empty-state-text">Create your first election to start collecting votes.</p>
+            <a href="{{ url_for('add_election') }}" class="btn btn-primary btn-sm mt-2">
+                <i class="fas fa-plus me-1"></i> Create Election
+            </a>
+        </div>
         {% endif %}
     </div>
 </div>

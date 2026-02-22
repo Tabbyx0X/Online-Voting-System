@@ -1,50 +1,41 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
 {% block title %}Votes – {{ election.title }}{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-header d-flex justify-content-between align-items-start">
     <div>
-        <h1 class="page-title">Votes</h1>
-        <span class="text-secondary small">{{ election.title }} • {{ votes|length }} votes</span>
+        <h1 class="page-title">Election Votes</h1>
+        <p class="page-subtitle">{{ election.title }}</p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="{{ url_for('view_results', election_id=election.id) }}" class="btn btn-outline-secondary btn-sm">Results</a>
-        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
-    </div>
+    <a href="{{ url_for('view_results', election_id=election.id) }}" class="btn btn-primary">
+        <i class="fas fa-chart-bar me-1"></i> View Results
+    </a>
 </div>
 
 <div class="row g-3 mb-4">
     <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="small text-secondary">Status</div>
-                <span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span>
-            </div>
+        <div class="stat-card" style="border-left-color: var(--primary);">
+            <div class="stat-label">Status</div>
+            <span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="small text-secondary">Start</div>
-                <div>{{ election.start_date.strftime('%b %d, %H:%M') }}</div>
-            </div>
+        <div class="stat-card" style="border-left-color: var(--accent);">
+            <div class="stat-label">Start Date</div>
+            <div class="stat-value" style="font-size: 1rem;">{{ election.start_date.strftime('%b %d, %H:%M') }}</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="small text-secondary">End</div>
-                <div>{{ election.end_date.strftime('%b %d, %H:%M') }}</div>
-            </div>
+        <div class="stat-card" style="border-left-color: #f59e0b;">
+            <div class="stat-label">End Date</div>
+            <div class="stat-value" style="font-size: 1rem;">{{ election.end_date.strftime('%b %d, %H:%M') }}</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="small text-secondary">Total Votes</div>
-                <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">{{ votes|length }}</div>
-            </div>
+        <div class="stat-card" style="border-left-color: #8b5cf6;">
+            <div class="stat-label">Total Votes</div>
+            <div class="stat-value">{{ votes|length }}</div>
         </div>
     </div>
 </div>
@@ -69,20 +60,23 @@
                     <tr>
                         <td>
                             <strong>{{ voter.name }}</strong>
-                            <span class="text-secondary d-block small">{{ voter.voter_id }}</span>
+                            <span class="text-muted d-block small">{{ voter.voter_id }}</span>
                         </td>
                         <td>
                             <strong>{{ candidate.name }}</strong>
-                            {% if candidate.party %}<span class="text-secondary small d-block">{{ candidate.party }}</span>{% endif %}
+                            {% if candidate.party %}<span class="text-muted small d-block">{{ candidate.party }}</span>{% endif %}
                         </td>
-                        <td class="text-secondary small">{{ vote.timestamp.strftime('%b %d, %H:%M') }}</td>
+                        <td class="text-muted small">{{ vote.timestamp.strftime('%b %d, %H:%M') }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="text-center py-5 text-muted">No votes cast yet</div>
+        <div class="empty-state">
+            <i class="fas fa-vote-yea"></i>
+            <p>No votes have been cast for this election yet</p>
+        </div>
         {% endif %}
     </div>
 </div>

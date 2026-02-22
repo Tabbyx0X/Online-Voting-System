@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
 {% block title %}Results – {{ election.title }}{% endblock %}
 
@@ -8,69 +8,69 @@
 
 {% block extra_css %}
 <style>
-    .chart-container { position: relative; height: 300px; }
-    .vote-count { font-size: 1.75rem; font-weight: 600; color: var(--accent); }
-    .percentage { font-size: 0.875rem; color: var(--text-secondary); }
+    .chart-container { position: relative; height: 320px; }
+    .vote-count { font-size: 2rem; font-weight: 700; color: var(--primary); }
+    .percentage { font-size: 0.875rem; color: var(--gray-500); }
+    .result-card { 
+        background: var(--gray-50); 
+        border-radius: var(--radius-md); 
+        padding: 1.25rem;
+        border-left: 4px solid var(--primary);
+    }
+    .result-card:nth-child(2n) { border-left-color: var(--accent); }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="page-title">Results</h1>
-        <p class="text-secondary small mb-0">{{ election.title }}</p>
-    </div>
-    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+<div class="page-header">
+    <h1 class="page-title">Election Results</h1>
+    <p class="page-subtitle">{{ election.title }}</p>
 </div>
 
 <div class="row g-3 mb-4">
     <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="small text-secondary">Status</div>
-                <span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span>
-            </div>
+        <div class="stat-card" style="border-left-color: var(--primary);">
+            <div class="stat-label">Status</div>
+            <span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="small text-secondary">Start</div>
-                <div>{{ election.start_date.strftime('%b %d, %Y %H:%M') }}</div>
-            </div>
+        <div class="stat-card" style="border-left-color: var(--accent);">
+            <div class="stat-label">Start Date</div>
+            <div class="stat-value" style="font-size: 1rem;">{{ election.start_date.strftime('%b %d, %Y %H:%M') }}</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="small text-secondary">End</div>
-                <div>{{ election.end_date.strftime('%b %d, %Y %H:%M') }}</div>
-            </div>
+        <div class="stat-card" style="border-left-color: #f59e0b;">
+            <div class="stat-label">End Date</div>
+            <div class="stat-value" style="font-size: 1rem;">{{ election.end_date.strftime('%b %d, %Y %H:%M') }}</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="small text-secondary">Total Votes</div>
-                <div class="vote-count">{{ total_votes }}</div>
-            </div>
+        <div class="stat-card" style="border-left-color: #8b5cf6;">
+            <div class="stat-label">Total Votes</div>
+            <div class="stat-value">{{ total_votes }}</div>
         </div>
     </div>
 </div>
 
 {% if results %}
-<div class="row g-3 mb-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Bar Chart</div>
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-2"></i>Vote Distribution
+            </div>
             <div class="card-body">
                 <div class="chart-container"><canvas id="barChart"></canvas></div>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Distribution</div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-chart-pie me-2"></i>Vote Share
+            </div>
             <div class="card-body">
                 <div class="chart-container"><canvas id="pieChart"></canvas></div>
             </div>
@@ -79,20 +79,24 @@
 </div>
 
 <div class="card mb-4">
-    <div class="card-header">Candidates</div>
+    <div class="card-header">
+        <i class="fas fa-users me-2"></i>Candidate Results
+    </div>
     <div class="card-body">
         <div class="row g-3">
             {% for result in results %}
             <div class="col-md-6">
-                <div class="d-flex justify-content-between align-items-center p-3" style="background: var(--bg-secondary); border-radius: 8px;">
-                    <div>
-                        <strong>{{ result.name }}</strong>
-                        {% if result.party %}<span class="text-secondary small d-block">{{ result.party }}</span>{% endif %}
-                    </div>
-                    <div class="text-end">
-                        <div class="vote-count">{{ result.votes }}</div>
-                        <div class="percentage">
-                            {% if total_votes > 0 %}{{ "%.1f"|format((result.votes / total_votes * 100)) }}%{% else %}0%{% endif %}
+                <div class="result-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ result.name }}</strong>
+                            {% if result.party %}<span class="text-muted small d-block">{{ result.party }}</span>{% endif %}
+                        </div>
+                        <div class="text-end">
+                            <div class="vote-count">{{ result.votes }}</div>
+                            <div class="percentage">
+                                {% if total_votes > 0 %}{{ "%.1f"|format((result.votes / total_votes * 100)) }}%{% else %}0%{% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -102,14 +106,17 @@
     </div>
 </div>
 {% else %}
-<div class="card">
-    <div class="card-body text-center py-5 text-muted">No votes cast yet.</div>
+<div class="empty-state">
+    <i class="fas fa-chart-bar"></i>
+    <p>No votes have been cast yet</p>
 </div>
 {% endif %}
 
 {% if detailed_votes %}
 <div class="card">
-    <div class="card-header">Vote Records</div>
+    <div class="card-header">
+        <i class="fas fa-list me-2"></i>Vote Records
+    </div>
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
@@ -127,7 +134,7 @@
                         <td><code class="small">{{ vote.voter_id }}</code></td>
                         <td>{{ vote.voter_name }}</td>
                         <td><strong>{{ vote.candidate_name }}</strong></td>
-                        <td class="text-secondary">{{ vote.timestamp.strftime('%b %d, %H:%M') }}</td>
+                        <td class="text-muted">{{ vote.timestamp.strftime('%b %d, %H:%M') }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -144,21 +151,51 @@
     const labels = resultsData.map(r => r.name);
     const votes = resultsData.map(r => r.votes);
     
-    const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#0ea5e9', '#22c55e'];
+    const colors = ['#1e3a8a', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#0ea5e9', '#22c55e'];
+    
+    Chart.defaults.font.family = "'Inter', -apple-system, sans-serif";
     
     new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{ label: 'Votes', data: votes, backgroundColor: colors.slice(0, labels.length), borderWidth: 0, borderRadius: 4 }]
+            datasets: [{ 
+                label: 'Votes', 
+                data: votes, 
+                backgroundColor: colors.slice(0, labels.length), 
+                borderWidth: 0, 
+                borderRadius: 6,
+                barPercentage: 0.7
+            }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }}, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }}}}
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false }}, 
+            scales: { 
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#e5e7eb' }},
+                x: { grid: { display: false }}
+            }
+        }
     });
     
     new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
-        data: { labels: labels, datasets: [{ data: votes, backgroundColor: colors.slice(0, labels.length), borderWidth: 0 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' }}}
+        data: { 
+            labels: labels, 
+            datasets: [{ 
+                data: votes, 
+                backgroundColor: colors.slice(0, labels.length), 
+                borderWidth: 2,
+                borderColor: '#fff'
+            }] 
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            cutout: '55%',
+            plugins: { legend: { position: 'right', labels: { padding: 16, usePointStyle: true }}}
+        }
     });
     
     {% if election.status == 'active' %}

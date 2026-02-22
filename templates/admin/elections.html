@@ -1,51 +1,82 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
 {% block title %}Elections{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="page-title">Elections</h1>
-    <div class="d-flex gap-2">
-        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
-        <a href="{{ url_for('add_election') }}" class="btn btn-primary btn-sm">New Election</a>
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1 class="page-title">Elections</h1>
+        <p class="page-subtitle">Manage all your voting elections</p>
     </div>
+    <a href="{{ url_for('add_election') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> New Election
+    </a>
 </div>
 
 <div class="card">
     <div class="card-body p-0">
         {% if elections %}
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for election in elections %}
-                        <tr>
-                            <td><strong>{{ election.title }}</strong></td>
-                            <td>{{ election.start_date.strftime('%b %d, %Y') }}</td>
-                            <td>{{ election.end_date.strftime('%b %d, %Y') }}</td>
-                            <td><span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span></td>
-                            <td class="text-end">
-                                <a href="{{ url_for('edit_election', election_id=election.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>Election</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Candidates</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for election in elections %}
+                    <tr class="fade-in">
+                        <td>
+                            <div class="fw-medium">{{ election.title }}</div>
+                            <small class="text-muted">{{ election.description[:40] if election.description else 'No description' }}{% if election.description and election.description|length > 40 %}...{% endif %}</small>
+                        </td>
+                        <td>
+                            <div class="small">{{ election.start_date.strftime('%b %d, %Y') }}</div>
+                            <div class="small text-muted">to {{ election.end_date.strftime('%b %d, %Y') }}</div>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-primary">{{ election.candidates|length }}</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('manage_candidates', election_id=election.id) }}" class="btn btn-outline-secondary" title="Candidates">
+                                    <i class="fas fa-users"></i>
+                                </a>
+                                <a href="{{ url_for('view_results', election_id=election.id) }}" class="btn btn-outline-secondary" title="Results">
+                                    <i class="fas fa-chart-bar"></i>
+                                </a>
+                                <a href="{{ url_for('edit_election', election_id=election.id) }}" class="btn btn-outline-secondary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                                 <form method="POST" action="{{ url_for('delete_election', election_id=election.id) }}" class="d-inline" onsubmit="return confirm('Delete this election?');">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                    <button type="submit" class="btn btn-sm btn-outline-secondary text-danger">Delete</button>
+                                    <button type="submit" class="btn btn-outline-secondary text-danger" title="Delete">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
                                 </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <div class="text-center py-5 text-muted">No elections created yet</div>
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-box-open"></i></div>
+            <div class="empty-state-title">No Elections Yet</div>
+            <p class="empty-state-text">Create your first election to start collecting votes.</p>
+            <a href="{{ url_for('add_election') }}" class="btn btn-primary btn-sm mt-2">
+                <i class="fas fa-plus me-1"></i> Create Election
+            </a>
+        </div>
         {% endif %}
     </div>
 </div>

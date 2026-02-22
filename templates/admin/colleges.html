@@ -1,19 +1,22 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
 {% block title %}Manage Colleges{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-university"></i> Manage Colleges</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCollegeModal">
-            <i class="fas fa-plus"></i> Add College
-        </button>
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1 class="page-title">Colleges</h1>
+        <p class="page-subtitle">Manage registered institutions</p>
     </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCollegeModal">
+        <i class="fas fa-plus me-1"></i> Add College
+    </button>
+</div>
 
-    <div class="card">
-        <div class="card-body">
-            <table class="table table-hover">
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
                 <thead>
                     <tr>
                         <th>College Code</th>
@@ -24,13 +27,19 @@
                 <tbody>
                     {% for college in colleges %}
                     <tr>
-                        <td><span class="badge bg-primary">{{ college.college_code }}</span></td>
-                        <td>{{ college.college_name }}</td>
-                        <td>{{ college.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td><code>{{ college.college_code }}</code></td>
+                        <td><strong>{{ college.college_name }}</strong></td>
+                        <td class="text-muted">{{ college.created_at.strftime('%b %d, %Y %H:%M') }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="3" class="text-center">No colleges found. Add your first college!</td>
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <i class="fas fa-university"></i>
+                                <p>No colleges found</p>
+                                <small class="text-muted">Add your first college to get started</small>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -44,25 +53,25 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New College</h5>
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New College</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="{{ url_for('add_college') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="college_code" class="form-label">College Code *</label>
-                        <input type="text" class="form-control" id="college_code" name="college_code" required>
-                        <small class="text-muted">Unique code (e.g., MIT, SPIT, KJSCE)</small>
+                        <label for="college_code" class="form-label">College Code</label>
+                        <input type="text" class="form-control" id="college_code" name="college_code" placeholder="e.g., MIT, SPIT" required>
+                        <div class="form-text">Unique identifier for the college</div>
                     </div>
                     <div class="mb-3">
-                        <label for="college_name" class="form-label">College Name *</label>
-                        <input type="text" class="form-control" id="college_name" name="college_name" required>
+                        <label for="college_name" class="form-label">College Name</label>
+                        <input type="text" class="form-control" id="college_name" name="college_name" placeholder="Full college name" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add College</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add College</button>
                 </div>
             </form>
         </div>

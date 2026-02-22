@@ -1,42 +1,50 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
 {% block title %}Edit Candidate{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <h1 class="page-title">Edit Candidate</h1>
+    <p class="page-subtitle">Update candidate information for this election</p>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="mb-4">
-            <h1 class="page-title">Edit Candidate</h1>
-        </div>
-        
+    <div class="col-lg-6">
         <div class="card">
-            <div class="card-body">
+            <div class="card-body p-4">
                 <form method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" value="{{ candidate.name }}" required>
+                        <label for="name" class="form-label">Candidate Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ candidate.name }}" placeholder="Full name" required>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="party" class="form-label">Party <span class="text-secondary small">(optional)</span></label>
-                        <input type="text" class="form-control" id="party" name="party" value="{{ candidate.party or '' }}">
+                        <label for="party" class="form-label">Party / Affiliation <span class="text-muted small">(optional)</span></label>
+                        <input type="text" class="form-control" id="party" name="party" value="{{ candidate.party or '' }}" placeholder="e.g., Independent, Student Union">
                     </div>
                     
                     <div class="mb-3">
-                        <label for="description" class="form-label">Description <span class="text-secondary small">(optional)</span></label>
-                        <textarea class="form-control" id="description" name="description" rows="3">{{ candidate.description or '' }}</textarea>
+                        <label for="description" class="form-label">Bio / Description <span class="text-muted small">(optional)</span></label>
+                        <textarea class="form-control" id="description" name="description" rows="4" placeholder="Brief description or manifesto">{{ candidate.description or '' }}</textarea>
                     </div>
                     
                     <div class="mb-4">
-                        <label for="photo_url" class="form-label">Photo URL <span class="text-secondary small">(optional)</span></label>
-                        <input type="url" class="form-control" id="photo_url" name="photo_url" value="{{ candidate.photo_url or '' }}" placeholder="https://...">
+                        <label for="photo_url" class="form-label">Photo URL <span class="text-muted small">(optional)</span></label>
+                        <input type="url" class="form-control" id="photo_url" name="photo_url" value="{{ candidate.photo_url or '' }}" placeholder="https://example.com/photo.jpg">
+                        <div class="form-text">Direct link to candidate's photo</div>
                     </div>
                     
+                    <hr class="my-4">
+                    
                     <div class="d-flex gap-2">
-                        <a href="{{ url_for('manage_candidates', election_id=candidate.election_id) }}" class="btn btn-outline-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{{ url_for('manage_candidates', election_id=candidate.election_id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Save Changes
+                        </button>
                     </div>
                 </form>
             </div>

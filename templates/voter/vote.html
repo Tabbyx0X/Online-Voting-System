@@ -4,41 +4,64 @@
 
 {% block extra_css %}
 <style>
+    .vote-header {
+        background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 1.5rem;
+    }
+    .vote-header h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .vote-header p { opacity: 0.85; margin: 0; }
     .candidate-option {
         cursor: pointer;
-        border: 2px solid var(--border-color);
-        transition: border-color 0.15s, background-color 0.15s;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        transition: all 0.15s ease;
+        background: white;
     }
     .candidate-option:hover {
-        border-color: var(--accent);
+        border-color: var(--primary);
+        box-shadow: var(--shadow-sm);
     }
     .candidate-option.selected {
-        border-color: var(--accent);
-        background-color: #f5f3ff;
+        border-color: var(--primary);
+        background-color: #eff6ff;
     }
     .candidate-option input[type="radio"] {
-        width: 18px;
-        height: 18px;
-        accent-color: var(--accent);
+        width: 20px;
+        height: 20px;
+        accent-color: var(--primary);
     }
+    .vote-warning {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: var(--radius-sm);
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        color: #92400e;
+    }
+    .vote-warning i { color: #f59e0b; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="mb-4">
-            <a href="{{ url_for('voter_dashboard') }}" class="text-secondary small">← Back to dashboard</a>
+    <div class="col-lg-8">
+        <div class="mb-3">
+            <a href="{{ url_for('voter_dashboard') }}" class="text-muted small">
+                <i class="fas fa-arrow-left me-1"></i> Back to dashboard
+            </a>
         </div>
         
-        <div class="card mb-4">
-            <div class="card-body">
-                <h1 class="h4 mb-2">{{ election.title }}</h1>
-                <p class="text-secondary mb-3">{{ election.description or 'Select a candidate to cast your vote' }}</p>
-                <div class="alert alert-warning small mb-0">
-                    <strong>Note:</strong> You can only vote once. Your choice cannot be changed after submission.
-                </div>
-            </div>
+        <div class="vote-header">
+            <h1>{{ election.title }}</h1>
+            <p>{{ election.description or 'Select a candidate to cast your vote' }}</p>
+        </div>
+        
+        <div class="vote-warning mb-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Important:</strong> You can only vote once. Your choice cannot be changed after submission.
         </div>
         
         <form method="POST" id="voteForm">
@@ -46,17 +69,17 @@
             
             <div class="d-flex flex-column gap-3 mb-4">
                 {% for candidate in candidates %}
-                <label class="card candidate-option" for="candidate_{{ candidate.id }}">
-                    <div class="card-body d-flex align-items-center gap-3">
+                <label class="card candidate-option p-0 mb-0" for="candidate_{{ candidate.id }}">
+                    <div class="card-body d-flex align-items-center gap-3 p-3">
                         <input type="radio" name="candidate_id" value="{{ candidate.id }}" 
                                id="candidate_{{ candidate.id }}" required>
                         <div class="flex-grow-1">
-                            <div class="fw-medium">{{ candidate.name }}</div>
+                            <div class="fw-semibold">{{ candidate.name }}</div>
                             {% if candidate.party %}
                             <div class="small text-muted">{{ candidate.party }}</div>
                             {% endif %}
                             {% if candidate.description %}
-                            <div class="small text-secondary mt-1">{{ candidate.description }}</div>
+                            <div class="small text-muted mt-1">{{ candidate.description }}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -65,10 +88,12 @@
             </div>
             
             <div class="d-flex justify-content-end gap-2">
-                <a href="{{ url_for('voter_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                <a href="{{ url_for('voter_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </a>
                 <button type="submit" class="btn btn-primary" 
-                        onclick="return confirm('Submit your vote? This cannot be undone.');">
-                    Submit Vote
+                        onclick="return confirm('Submit your vote for this election? This action cannot be undone.');">
+                    <i class="fas fa-check me-1"></i> Submit Vote
                 </button>
             </div>
         </form>

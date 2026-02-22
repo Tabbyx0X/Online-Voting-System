@@ -2,51 +2,194 @@
 
 {% block title %}Home - Voting System{% endblock %}
 
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%);
+        color: white;
+        padding: 4rem 2rem;
+        border-radius: var(--radius-lg);
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    .hero-section h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    .hero-section p {
+        font-size: 1.125rem;
+        opacity: 0.9;
+        max-width: 500px;
+        margin: 0 auto 2rem;
+    }
+    .hero-section .btn-light {
+        background: white;
+        color: var(--primary);
+        font-weight: 500;
+    }
+    .hero-section .btn-light:hover {
+        background: var(--gray-100);
+    }
+    .hero-section .btn-outline-light {
+        border-color: rgba(255,255,255,0.5);
+    }
+    .hero-section .btn-outline-light:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: white;
+    }
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .section-header h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--gray-900);
+    }
+    .election-card {
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        height: 100%;
+        transition: all 0.15s ease;
+        background: white;
+    }
+    .election-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
+    }
+    .election-card h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--gray-900);
+    }
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    @media (max-width: 768px) {
+        .feature-grid { grid-template-columns: 1fr; }
+        .hero-section h1 { font-size: 2rem; }
+    }
+    .feature-item {
+        text-align: center;
+        padding: 1.5rem;
+    }
+    .feature-item .icon {
+        width: 48px;
+        height: 48px;
+        background: #eff6ff;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    .feature-item .icon i {
+        font-size: 1.25rem;
+        color: var(--primary);
+    }
+    .feature-item h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--gray-900);
+    }
+    .feature-item p {
+        font-size: 0.875rem;
+        color: var(--gray-500);
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="text-center py-5 mb-4">
-    <h1 class="page-title mb-2">Online Voting System</h1>
-    <p class="text-secondary mb-4">Secure and transparent digital voting platform</p>
-    <div class="d-flex justify-content-center gap-2">
-        <a class="btn btn-primary" href="{{ url_for('voter_register') }}">Create Account</a>
-        <a class="btn btn-outline-secondary" href="{{ url_for('voter_login') }}">Sign In</a>
+<div class="hero-section">
+    <h1>Online Voting System</h1>
+    <p>Secure, transparent, and easy-to-use digital voting platform for modern elections</p>
+    <div class="d-flex justify-content-center gap-3">
+        <a class="btn btn-light px-4" href="{{ url_for('voter_register') }}">
+            <i class="fas fa-user-plus me-2"></i>Create Account
+        </a>
+        <a class="btn btn-outline-light px-4" href="{{ url_for('voter_login') }}">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+        </a>
     </div>
 </div>
 
-<div class="mb-4">
-    <h2 class="h5 mb-3">Elections</h2>
+<div class="feature-grid">
+    <div class="feature-item">
+        <div class="icon">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h4>Secure Voting</h4>
+        <p>End-to-end encryption and authentication for every vote</p>
+    </div>
+    <div class="feature-item">
+        <div class="icon">
+            <i class="fas fa-chart-bar"></i>
+        </div>
+        <h4>Real-time Results</h4>
+        <p>Live vote counting and transparent result tracking</p>
+    </div>
+    <div class="feature-item">
+        <div class="icon">
+            <i class="fas fa-mobile-alt"></i>
+        </div>
+        <h4>Vote Anywhere</h4>
+        <p>Access from any device - desktop, tablet, or mobile</p>
+    </div>
+</div>
+
+<div class="section-header">
+    <h2><i class="fas fa-ballot-check me-2"></i>Current Elections</h2>
+    <span class="text-muted small">{{ elections|length }} election{% if elections|length != 1 %}s{% endif %} available</span>
 </div>
 
 {% if elections %}
     <div class="row g-3">
         {% for election in elections %}
         <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h3 class="card-title h6 mb-0">{{ election.title }}</h3>
-                        <span class="badge-status badge-{{ election.status }}">{{ election.status|capitalize }}</span>
-                    </div>
-                    <p class="text-secondary small mb-3">{{ election.description or 'No description' }}</p>
-                    <div class="small text-muted">
-                        <div class="mb-1"><strong>Start:</strong> {{ election.start_date.strftime('%b %d, %Y %H:%M') }}</div>
-                        <div class="mb-1"><strong>End:</strong> {{ election.end_date.strftime('%b %d, %Y %H:%M') }}</div>
-                        <div><strong>Candidates:</strong> {{ election.candidates|length }}</div>
-                    </div>
-                    {% if election.status == 'active' %}
-                    <div class="mt-3">
-                        <a href="{{ url_for('voter_login') }}" class="btn btn-primary btn-sm w-100">Vote Now</a>
-                    </div>
-                    {% endif %}
+            <div class="election-card">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h3>{{ election.title }}</h3>
+                    <span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span>
                 </div>
+                <p class="text-muted small mb-3">{{ election.description or 'No description provided' }}</p>
+                <div class="small text-muted mb-3">
+                    <div class="mb-1"><i class="fas fa-calendar me-2"></i>Start: {{ election.start_date.strftime('%b %d, %Y %H:%M') }}</div>
+                    <div class="mb-1"><i class="fas fa-calendar-check me-2"></i>End: {{ election.end_date.strftime('%b %d, %Y %H:%M') }}</div>
+                    <div><i class="fas fa-users me-2"></i>{{ election.candidates|length }} candidate{% if election.candidates|length != 1 %}s{% endif %}</div>
+                </div>
+                {% if election.status == 'active' %}
+                <a href="{{ url_for('voter_login') }}" class="btn btn-primary btn-sm w-100">
+                    <i class="fas fa-vote-yea me-1"></i> Vote Now
+                </a>
+                {% elif election.status == 'upcoming' %}
+                <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                    <i class="fas fa-clock me-1"></i> Coming Soon
+                </button>
+                {% else %}
+                <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                    <i class="fas fa-check me-1"></i> Ended
+                </button>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
     </div>
 {% else %}
-    <div class="card">
-        <div class="card-body text-center py-5 text-muted">
-            No elections available at the moment.
-        </div>
+    <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>No elections available at the moment</p>
+        <small class="text-muted">Check back later for upcoming elections</small>
     </div>
 {% endif %}
 {% endblock %}

@@ -1,55 +1,58 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
 {% block title %}Candidates – {{ election.title }}{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-header d-flex justify-content-between align-items-start">
     <div>
         <h1 class="page-title">Candidates</h1>
-        <p class="text-secondary small mb-0">{{ election.title }}</p>
+        <p class="page-subtitle">{{ election.title }}</p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Back</a>
-        <a href="{{ url_for('add_candidate', election_id=election.id) }}" class="btn btn-primary btn-sm">+ Add</a>
-    </div>
+    <a href="{{ url_for('add_candidate', election_id=election.id) }}" class="btn btn-primary">
+        <i class="fas fa-plus me-1"></i> Add Candidate
+    </a>
 </div>
 
 {% if election.candidates %}
-<div class="row g-3">
+<div class="row g-4">
     {% for candidate in election.candidates %}
     <div class="col-md-6 col-lg-4">
-        <div class="card h-100">
-            <div class="card-body">
+        <div class="card h-100 fade-in">
+            <div class="card-body text-center">
                 {% if candidate.photo_url %}
-                <div class="text-center mb-3">
+                <div class="mb-3">
                     <img src="{{ candidate.photo_url }}" alt="{{ candidate.name }}" 
-                         class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover; border: 2px solid var(--border-color);">
+                         class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid var(--gray-200);">
                 </div>
                 {% else %}
-                <div class="text-center mb-3">
-                    <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--bg-secondary); display: inline-flex; align-items: center; justify-content: center;">
-                        <span class="text-secondary" style="font-size: 2rem;">{{ candidate.name[0] }}</span>
+                <div class="mb-3">
+                    <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); display: inline-flex; align-items: center; justify-content: center;">
+                        <span class="text-white" style="font-size: 2.5rem; font-weight: 600;">{{ candidate.name[0]|upper }}</span>
                     </div>
                 </div>
                 {% endif %}
                 
-                <h6 class="text-center mb-1">{{ candidate.name }}</h6>
+                <h5 class="mb-1">{{ candidate.name }}</h5>
                 
                 {% if candidate.party %}
-                <p class="text-center text-secondary small mb-2">{{ candidate.party }}</p>
+                <span class="badge badge-primary mb-2">{{ candidate.party }}</span>
                 {% endif %}
                 
                 {% if candidate.description %}
-                <p class="small text-secondary">{{ candidate.description[:100] }}{% if candidate.description|length > 100 %}...{% endif %}</p>
+                <p class="small text-muted mt-2 mb-0">{{ candidate.description[:80] }}{% if candidate.description|length > 80 %}...{% endif %}</p>
                 {% endif %}
             </div>
-            <div class="card-footer bg-transparent border-top-0 pt-0">
+            <div class="card-footer bg-transparent">
                 <div class="d-flex gap-2">
-                    <a href="{{ url_for('edit_candidate', candidate_id=candidate.id) }}" class="btn btn-outline-secondary btn-sm flex-grow-1">Edit</a>
+                    <a href="{{ url_for('edit_candidate', candidate_id=candidate.id) }}" class="btn btn-outline-secondary btn-sm flex-grow-1">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
                     <form method="POST" action="{{ url_for('delete_candidate', candidate_id=candidate.id) }}" 
                           class="flex-grow-1" onsubmit="return confirm('Delete this candidate?');">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="btn btn-outline-secondary btn-sm text-danger w-100">Delete</button>
+                        <button type="submit" class="btn btn-outline-secondary btn-sm text-danger w-100">
+                            <i class="fas fa-trash-alt me-1"></i> Delete
+                        </button>
                     </form>
                 </div>
             </div>
@@ -59,8 +62,13 @@
 </div>
 {% else %}
 <div class="card">
-    <div class="card-body text-center py-5 text-muted">
-        No candidates yet. Add one to get started.
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="fas fa-user-plus"></i></div>
+        <div class="empty-state-title">No Candidates Yet</div>
+        <p class="empty-state-text">Add candidates to this election so voters can cast their votes.</p>
+        <a href="{{ url_for('add_candidate', election_id=election.id) }}" class="btn btn-primary btn-sm mt-2">
+            <i class="fas fa-plus me-1"></i> Add First Candidate
+        </a>
     </div>
 </div>
 {% endif %}

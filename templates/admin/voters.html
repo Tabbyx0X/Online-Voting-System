@@ -1,75 +1,84 @@
-{% extends 'base.html' %}
+{% extends 'admin/base_admin.html' %}
 
 {% block title %}Voters{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="page-title">Voters</h1>
-    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary btn-sm">← Dashboard</a>
+<div class="page-header d-flex justify-content-between align-items-start">
+    <div>
+        <h1 class="page-title">Voters</h1>
+        <p class="page-subtitle">{{ voters|length }} registered voters</p>
+    </div>
 </div>
 
 <div class="card">
-    <div class="card-header">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <span class="text-secondary small">{{ voters|length }} registered voters</span>
-            </div>
-            <div class="col-md-6">
-                <input type="text" id="searchVoters" class="form-control form-control-sm" placeholder="Search voters...">
-            </div>
-        </div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Registered Voters</span>
+        <input type="text" id="searchVoters" class="form-control form-control-sm" style="max-width: 250px;" placeholder="Search voters...">
     </div>
     <div class="card-body p-0">
         {% if voters %}
-            <div class="table-responsive">
-                <table class="table table-hover mb-0" id="votersTable">
-                    <thead>
-                        <tr>
-                            <th>Voter ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Registered</th>
-                            <th>Votes</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for voter in voters %}
-                        <tr>
-                            <td><code class="small">{{ voter.voter_id }}</code></td>
-                            <td><strong>{{ voter.name }}</strong></td>
-                            <td class="text-secondary">{{ voter.email }}</td>
-                            <td>{{ voter.created_at.strftime('%b %d, %Y') if voter.created_at else 'N/A' }}</td>
-                            <td>{{ voter.votes|length }}</td>
-                            <td class="text-end">
-                                <button type="button" class="btn btn-sm btn-outline-secondary text-danger" 
-                                        onclick="showDeleteModal('{{ voter.id }}', '{{ voter.name }}', '{{ voter.voter_id }}')">
-                                    Delete
-                                </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-responsive">
+            <table class="table mb-0" id="votersTable">
+                <thead>
+                    <tr>
+                        <th>Voter</th>
+                        <th>Contact</th>
+                        <th>Registered</th>
+                        <th>Votes</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for voter in voters %}
+                    <tr class="fade-in">
+                        <td>
+                            <div class="fw-medium">{{ voter.name }}</div>
+                            <code class="small text-muted">{{ voter.voter_id }}</code>
+                        </td>
+                        <td class="text-secondary small">{{ voter.email }}</td>
+                        <td class="small">{{ voter.created_at.strftime('%b %d, %Y') if voter.created_at else 'N/A' }}</td>
+                        <td>
+                            <span class="badge badge-{% if voter.votes|length > 0 %}accent{% else %}primary{% endif %}">
+                                {{ voter.votes|length }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <button type="button" class="btn btn-sm btn-outline-secondary text-danger" 
+                                    onclick="showDeleteModal('{{ voter.id }}', '{{ voter.name }}', '{{ voter.voter_id }}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <div class="text-center py-5 text-muted">No voters registered yet</div>
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-users"></i></div>
+            <div class="empty-state-title">No Voters Yet</div>
+            <p class="empty-state-text">Voters will appear here once they register.</p>
+        </div>
         {% endif %}
     </div>
 </div>
 
+<!-- Delete Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title h6">Delete Voter</h5>
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Delete Voter</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <p class="small mb-2">Are you sure you want to delete:</p>
-                <p class="mb-0"><strong id="modalVoterName"></strong><br><code class="small" id="modalVoterId"></code></p>
+            <div class="modal-body pt-0">
+                <p class="text-muted small mb-2">Are you sure you want to delete:</p>
+                <p class="mb-0">
+                    <strong id="modalVoterName"></strong><br>
+                    <code class="small" id="modalVoterId"></code>
+                </p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer border-0">
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
                 <form id="deleteForm" method="POST" class="d-inline">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -79,7 +88,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
 document.getElementById('searchVoters').addEventListener('keyup', function() {
     const searchTerm = this.value.toLowerCase();
