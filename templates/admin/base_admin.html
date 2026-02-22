@@ -36,13 +36,9 @@
                     <i class="fas fa-users"></i>
                     Voters
                 </a>
-                <a href="{{ url_for('view_all_votes') }}" class="sidebar-nav-item {% if request.endpoint and 'vote' in request.endpoint %}active{% endif %}">
-                    <i class="fas fa-chart-bar"></i>
-                    Results
-                </a>
-                <a href="{{ url_for('admin_profile') }}" class="sidebar-nav-item {% if request.endpoint and 'profile' in request.endpoint %}active{% endif %}">
-                    <i class="fas fa-user-cog"></i>
-                    Profile
+                <a href="{{ url_for('view_database') }}" class="sidebar-nav-item {% if request.endpoint == 'view_database' %}active{% endif %}">
+                    <i class="fas fa-database"></i>
+                    Database
                 </a>
             </nav>
             

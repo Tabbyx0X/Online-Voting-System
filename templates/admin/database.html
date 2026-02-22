@@ -22,43 +22,10 @@
     <p class="page-subtitle">Live view of all database records</p>
 </div>
 
-<!-- Colleges Table -->
+<!-- Admins Table -->
 <div class="card db-card">
     <div class="card-header" style="background: var(--primary); color: white;">
-        <i class="fas fa-university"></i>Colleges <span class="badge bg-light text-dark ms-2">{{ colleges|length }}</span>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover table-sm mb-0">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for college in colleges %}
-                    <tr>
-                        <td>{{ college.id }}</td>
-                        <td><code>{{ college.college_code }}</code></td>
-                        <td>{{ college.college_name }}</td>
-                        <td class="text-muted">{{ college.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                    </tr>
-                    {% else %}
-                    <tr><td colspan="4" class="text-center text-muted py-3">No records</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Admins/Teachers Table -->
-<div class="card db-card">
-    <div class="card-header" style="background: var(--accent); color: white;">
-        <i class="fas fa-user-shield"></i>Admins & Teachers <span class="badge bg-light text-dark ms-2">{{ admins|length }}</span>
+        <i class="fas fa-user-shield"></i>Admins <span class="badge bg-light text-dark ms-2">{{ admins|length }}</span>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -69,7 +36,6 @@
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
-                        <th>College</th>
                         <th>Created</th>
                     </tr>
                 </thead>
@@ -86,11 +52,10 @@
                             <span class="status-badge status-active">Teacher</span>
                             {% endif %}
                         </td>
-                        <td>{{ admin.college_code or '—' }}</td>
                         <td class="text-muted">{{ admin.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="6" class="text-center text-muted py-3">No records</td></tr>
+                    <tr><td colspan="5" class="text-center text-muted py-3">No records</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -100,7 +65,7 @@
 
 <!-- Voters Table -->
 <div class="card db-card">
-    <div class="card-header" style="background: #0ea5e9; color: white;">
+    <div class="card-header" style="background: var(--accent); color: white;">
         <i class="fas fa-users"></i>Voters <span class="badge bg-light text-dark ms-2">{{ voters|length }}</span>
     </div>
     <div class="card-body p-0">
@@ -112,7 +77,6 @@
                         <th>Voter ID</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>College</th>
                         <th>Created</th>
                     </tr>
                 </thead>
@@ -123,11 +87,10 @@
                         <td><code>{{ voter.voter_id }}</code></td>
                         <td><strong>{{ voter.name }}</strong></td>
                         <td>{{ voter.email }}</td>
-                        <td>{{ voter.college_code }}</td>
                         <td class="text-muted">{{ voter.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="6" class="text-center text-muted py-3">No records</td></tr>
+                    <tr><td colspan="5" class="text-center text-muted py-3">No records</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -147,11 +110,9 @@
                     <tr>
                         <th>ID</th>
                         <th>Title</th>
-                        <th>College</th>
                         <th>Status</th>
                         <th>Start</th>
                         <th>End</th>
-                        <th>Created By</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -159,14 +120,12 @@
                     <tr>
                         <td>{{ election.id }}</td>
                         <td><strong>{{ election.title }}</strong></td>
-                        <td>{{ election.college_code }}</td>
                         <td><span class="status-badge status-{{ election.status }}">{{ election.status|capitalize }}</span></td>
                         <td class="text-muted">{{ election.start_date.strftime('%Y-%m-%d %H:%M') }}</td>
                         <td class="text-muted">{{ election.end_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                        <td>{{ election.creator.username }}</td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="7" class="text-center text-muted py-3">No records</td></tr>
+                    <tr><td colspan="5" class="text-center text-muted py-3">No records</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
