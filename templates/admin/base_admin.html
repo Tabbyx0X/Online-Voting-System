@@ -28,19 +28,19 @@
                     <i class="fas fa-th-large"></i>
                     Dashboard
                 </a>
-                <a href="{{ url_for('manage_elections') }}" class="sidebar-nav-item {% if 'election' in request.endpoint|default('', true) %}active{% endif %}">
+                <a href="{{ url_for('manage_elections') }}" class="sidebar-nav-item {% if request.endpoint and 'election' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-box"></i>
                     Elections
                 </a>
-                <a href="{{ url_for('admin_voters') }}" class="sidebar-nav-item {% if 'voter' in request.endpoint|default('', true) %}active{% endif %}">
+                <a href="{{ url_for('admin_voters') }}" class="sidebar-nav-item {% if request.endpoint and 'voter' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-users"></i>
                     Voters
                 </a>
-                <a href="{{ url_for('view_all_votes') }}" class="sidebar-nav-item {% if 'vote' in request.endpoint|default('', true) %}active{% endif %}">
+                <a href="{{ url_for('view_all_votes') }}" class="sidebar-nav-item {% if request.endpoint and 'vote' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-chart-bar"></i>
                     Results
                 </a>
-                <a href="{{ url_for('admin_profile') }}" class="sidebar-nav-item {% if 'profile' in request.endpoint|default('', true) %}active{% endif %}">
+                <a href="{{ url_for('admin_profile') }}" class="sidebar-nav-item {% if request.endpoint and 'profile' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-user-cog"></i>
                     Profile
                 </a>
