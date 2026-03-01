@@ -4,11 +4,12 @@ import os
 # Add parent directory to path so we can import app
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import app, db, Admin
+from app import app, db, Admin, run_migrations
 
 # Create all database tables and default admin on startup
 with app.app_context():
     db.create_all()
+    run_migrations()
     
     # Admin credentials from environment variables (secure)
     admin_configs = [

@@ -1,93 +1,22 @@
 {% extends 'admin/base_admin.html' %}
 
-{% block title %}Manage Teachers{% endblock %}
+{% block title %}Page Not Available{% endblock %}
 
 {% block content %}
-<div class="page-header d-flex justify-content-between align-items-start">
-    <div>
-        <h1 class="page-title">Teachers</h1>
-        <p class="page-subtitle">Manage teacher accounts</p>
-    </div>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
-        <i class="fas fa-plus me-1"></i> Add Teacher
-    </button>
+<div class="page-header">
+    <h1 class="page-title">Page Not Available</h1>
+    <p class="page-subtitle">Teacher management has been removed from the system.</p>
 </div>
 
 <div class="card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>College</th>
-                        <th>Created</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for teacher in teachers %}
-                    <tr>
-                        <td><strong>{{ teacher.username }}</strong></td>
-                        <td>{{ teacher.email }}</td>
-                        <td><code>{{ teacher.college_code }}</code></td>
-                        <td class="text-muted">{{ teacher.created_at.strftime('%b %d, %Y') }}</td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="4">
-                            <div class="empty-state">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                <p>No teachers found</p>
-                                <small class="text-muted">Add your first teacher account</small>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Add Teacher Modal -->
-<div class="modal fade" id="addTeacherModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New Teacher</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" action="{{ url_for('add_teacher') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Teacher username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="teacher@example.com" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Secure password" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="college_code" class="form-label">College</label>
-                        <select class="form-select" id="college_code" name="college_code" required>
-                            <option value="">Select College</option>
-                            {% for college in colleges %}
-                            <option value="{{ college.college_code }}">{{ college.college_name }} ({{ college.college_code }})</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-1"></i> Add Teacher</button>
-                </div>
-            </form>
+    <div class="card-body text-center py-5">
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="fas fa-info-circle"></i></div>
+            <div class="empty-state-title">Feature Removed</div>
+            <p class="empty-state-text">Teacher management is no longer part of the system.</p>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary btn-sm mt-2">
+                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+            </a>
         </div>
     </div>
 </div>

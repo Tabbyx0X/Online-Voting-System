@@ -21,7 +21,7 @@ exports.isAuthenticated = asyncHandler(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, config.jwtSecret);
-    req.user = await User.findById(decoded.id).populate('collegeId');
+    req.user = await User.findById(decoded.id);
 
     if (!req.user) {
       return res.status(401).json({ 
@@ -58,30 +58,3 @@ exports.authorize = (...roles) => {
   };
 };
 
-exports.filterByCollege = (req, res, next) => {
-  // Admin has access to all colleges
-  if (req.user.role === 'admin') {
-    req.collegeFilter = {}; // No restriction
-  } else {
-    req.collegeFilter = { collegeId: req.user.collegeId };
-  }
-  next();
-};
-
-exports.checkCollegeOwnership = asyncHandler(async (req, res, next) => {
-  // Admin can access all colleges
-  if (req.user.role === 'admin') {
-    return next();
-  }
-
-  const resourceCollegeId = req.params.collegeId || req.body.collegeId;
-
-  if (resourceCollegeId && resourceCollegeId.toString() !== req.user.collegeId.toString()) {
-    return res.status(403).json({
-      success: false,
-      error: 'Not authorized to access this college\'s resources'
-    });
-  }
-
-  next();
-});

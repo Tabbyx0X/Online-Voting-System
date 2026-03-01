@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Poll = require('../models/Poll');
 const { asyncHandler } = require('../middleware/errorHandler');
-const { isAuthenticated, authorize, filterByCollege } = require('../middleware/auth');
+const { isAuthenticated, authorize } = require('../middleware/auth');
 
 // @route   POST /api/polls
 // @desc    Create new poll
@@ -36,7 +36,6 @@ router.post('/', isAuthenticated, authorize('teacher', 'admin'),
     options: options.map(opt => ({ text: opt, votes: [] })),
     pollType: pollType || 'single',
     targetAudience: targetAudience || {},
-    collegeId: req.user.collegeId,
     createdBy: req.user._id,
     endDate: new Date(endDate),
     allowAnonymous: allowAnonymous || false,
@@ -51,14 +50,14 @@ router.post('/', isAuthenticated, authorize('teacher', 'admin'),
 }));
 
 // @route   GET /api/polls
-// @desc    Get all polls (filtered by college)
+// @desc    Get all polls
 // @access  Private
-router.get('/', isAuthenticated, filterByCollege, 
+router.get('/', isAuthenticated, 
   asyncHandler(async (req, res) => {
   
   const { page = 1, limit = 10, status, createdBy } = req.query;
 
-  const query = { ...req.collegeFilter };
+  const query = {};
 
   // Filter by status
   if (status === 'active') {
@@ -119,14 +118,6 @@ router.get('/:id', isAuthenticated, asyncHandler(async (req, res) => {
     return res.status(404).json({ 
       success: false, 
       error: 'Poll not found' 
-    });
-  }
-
-  // Check if user can view this poll
-  if (poll.collegeId.toString() !== req.user.collegeId.toString()) {
-    return res.status(403).json({ 
-      success: false, 
-      error: 'Not authorized to view this poll' 
     });
   }
 

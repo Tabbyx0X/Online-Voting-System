@@ -124,7 +124,7 @@ def generate_test_data():
                 {
                     'name': 'Alex Johnson',
                     'party': 'Active Campus',
-                    'description': 'Experienced organizer focused on inter-college tournaments.',
+                    'description': 'Experienced organizer focused on tournaments.',
                     'photo_url': 'https://ui-avatars.com/api/?name=Alex+Johnson&size=200&background=F97316&color=fff'
                 }
             ]

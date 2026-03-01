@@ -50,22 +50,6 @@ class AuthManager {
     }
   }
 
-  async verifyCollegeCode(code) {
-    try {
-      const response = await fetch(`${this.baseURL}/college/verify-code`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ code })
-      });
-
-      return await response.json();
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async getCurrentUser() {
     try {
       const response = await fetch(`${this.baseURL}/auth/me`, {

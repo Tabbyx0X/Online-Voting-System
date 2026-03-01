@@ -44,7 +44,6 @@ app.use(express.static('public'));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/college', require('./routes/college'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/polls', require('./routes/polls'));
 

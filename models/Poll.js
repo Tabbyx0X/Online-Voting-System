@@ -35,11 +35,6 @@ const pollSchema = new mongoose.Schema({
     semester: String,
     specificUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
   },
-  collegeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'College',
-    required: true
-  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

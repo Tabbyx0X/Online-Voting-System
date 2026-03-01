@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const College = require('../models/College');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { isAuthenticated } = require('../middleware/auth');
 const { registerValidation, loginValidation, validate } = require('../middleware/validation');
@@ -10,7 +9,7 @@ const { registerValidation, loginValidation, validate } = require('../middleware
 // @desc    Register new user
 // @access  Public
 router.post('/register', registerValidation, validate, asyncHandler(async (req, res) => {
-  const { name, email, password, collegeCode, department, phoneNumber } = req.body;
+  const { name, email, password, department, phoneNumber } = req.body;
 
   // Check if user exists
   let user = await User.findOne({ email: email.toLowerCase() });
@@ -21,39 +20,14 @@ router.post('/register', registerValidation, validate, asyncHandler(async (req, 
     });
   }
 
-  // Verify college code
-  const college = await College.findOne({ 
-    code: collegeCode.toUpperCase(), 
-    isActive: true 
-  });
-
-  if (!college) {
-    return res.status(400).json({ 
-      success: false, 
-      error: 'Invalid or inactive college code' 
-    });
-  }
-
-  if (!college.settings.allowSelfRegistration) {
-    return res.status(403).json({ 
-      success: false, 
-      error: 'Self registration is disabled for this college' 
-    });
-  }
-
   // Create user
   user = await User.create({
     name,
     email: email.toLowerCase(),
     password,
-    collegeId: college._id,
     department,
     phoneNumber
   });
-
-  // Update college statistics
-  college.statistics.totalStudents += 1;
-  await college.save();
 
   // Send token response
   sendTokenResponse(user, 201, res, 'Registration successful');
@@ -67,8 +41,7 @@ router.post('/login', loginValidation, validate, asyncHandler(async (req, res) =
 
   // Find user with password
   const user = await User.findOne({ email: email.toLowerCase() })
-    .select('+password')
-    .populate('collegeId', 'name code');
+    .select('+password');
 
   if (!user) {
     return res.status(401).json({ 
@@ -104,8 +77,7 @@ router.post('/login', loginValidation, validate, asyncHandler(async (req, res) =
 // @desc    Get current logged in user
 // @access  Private
 router.get('/me', isAuthenticated, asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id)
-    .populate('collegeId', 'name code logo contact');
+  const user = await User.findById(req.user.id);
 
   res.json({
     success: true,
@@ -196,8 +168,7 @@ const sendTokenResponse = (user, statusCode, res, message) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
-        collegeId: user.collegeId
+        role: user.role
       }
     });
 };

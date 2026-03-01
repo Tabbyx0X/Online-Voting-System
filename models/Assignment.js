@@ -17,11 +17,6 @@ const assignmentSchema = new mongoose.Schema({
   department: String,
   year: String,
   semester: String,
-  collegeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'College',
-    required: true
-  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

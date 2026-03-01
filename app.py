@@ -107,12 +107,12 @@ def add_security_headers(response):
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
     response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
-    # CSP - allow Bootstrap and FontAwesome CDNs
+    # CSP - allow Bootstrap, FontAwesome, and Google Fonts CDNs
     response.headers['Content-Security-Policy'] = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-        "font-src 'self' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+        "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; "
         "img-src 'self' data: https:; "
         "connect-src 'self';"
     )
@@ -877,9 +877,28 @@ def view_database():
 
 # ==================== Initialize Database ====================
 
+def run_migrations():
+    """Drop legacy college_code columns that no longer exist in the models"""
+    from sqlalchemy import text
+    try:
+        for table in ['elections', 'admins', 'voters']:
+            try:
+                db.session.execute(text(f"ALTER TABLE {table} DROP COLUMN IF EXISTS college_code"))
+            except Exception:
+                pass
+        try:
+            db.session.execute(text("DROP TABLE IF EXISTS colleges CASCADE"))
+        except Exception:
+            pass
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
+
 def init_db():
     with app.app_context():
         db.create_all()
+        run_migrations()
         
         # Create default admin if not exists
         if not Admin.query.filter_by(username='admin').first():

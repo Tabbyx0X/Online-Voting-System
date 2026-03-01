@@ -146,7 +146,6 @@ vercel --prod
    - `elections`
    - `candidates`
    - `votes`
-   - `colleges` (if applicable)
 
 ### **Run SQL Queries:**
 

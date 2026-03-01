@@ -76,15 +76,6 @@ CREATE TABLE admins (
     password_hash VARCHAR(255) NOT NULL,
     email VARCHAR(120) NOT NULL,
     role VARCHAR(20) DEFAULT 'admin',
-    college_code VARCHAR(20),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Create colleges table
-CREATE TABLE colleges (
-    id SERIAL PRIMARY KEY,
-    college_code VARCHAR(20) UNIQUE NOT NULL,
-    college_name VARCHAR(200) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -95,7 +86,6 @@ CREATE TABLE voters (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(120) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    college_code VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -107,7 +97,6 @@ CREATE TABLE elections (
     start_date TIMESTAMP NOT NULL,
     end_date TIMESTAMP NOT NULL,
     status VARCHAR(20) DEFAULT 'upcoming',
-    college_code VARCHAR(20),
     created_by INTEGER REFERENCES admins(id),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -146,7 +135,6 @@ VALUES (
 -- Create indexes for performance
 CREATE INDEX idx_votes_election ON votes(election_id);
 CREATE INDEX idx_candidates_election ON candidates(election_id);
-CREATE INDEX idx_elections_college ON elections(college_code);
 ```
 
 **Option B: Use Python Script via Vercel Function**

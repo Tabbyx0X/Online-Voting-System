@@ -1,7 +1,7 @@
 {
-  "name": "college-assignment-system",
+  "name": "voting-system",
   "version": "2.0.0",
-  "description": "Enhanced College Assignment Management System",
+  "description": "Online Voting Management System",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",

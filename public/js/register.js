@@ -1,52 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('registerForm');
-  const collegeCodeInput = document.getElementById('collegeCode');
-  const collegeNameDisplay = document.getElementById('collegeName');
   const submitBtn = document.getElementById('submitBtn');
-  
-  let collegeVerified = false;
-
-  // Real-time college code verification
-  let debounceTimer;
-  collegeCodeInput.addEventListener('input', async (e) => {
-    clearTimeout(debounceTimer);
-    const code = e.target.value.trim();
-
-    if (code.length < 4) {
-      collegeNameDisplay.textContent = '';
-      collegeVerified = false;
-      return;
-    }
-
-    collegeNameDisplay.textContent = 'Verifying...';
-    collegeNameDisplay.className = 'text-info';
-
-    debounceTimer = setTimeout(async () => {
-      try {
-        const result = await authManager.verifyCollegeCode(code);
-        
-        if (result.success && result.data.valid) {
-          collegeNameDisplay.textContent = `✓ ${result.data.collegeName}`;
-          collegeNameDisplay.className = 'text-success';
-          collegeVerified = true;
-          
-          if (!result.data.allowRegistration) {
-            collegeNameDisplay.textContent += ' (Registration disabled)';
-            collegeNameDisplay.className = 'text-warning';
-            collegeVerified = false;
-          }
-        } else {
-          collegeNameDisplay.textContent = '✗ Invalid college code';
-          collegeNameDisplay.className = 'text-danger';
-          collegeVerified = false;
-        }
-      } catch (error) {
-        collegeNameDisplay.textContent = '✗ Error verifying code';
-        collegeNameDisplay.className = 'text-danger';
-        collegeVerified = false;
-      }
-    }, 500);
-  });
 
   // Password strength indicator
   const passwordInput = document.getElementById('password');
@@ -73,16 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    if (!collegeVerified) {
-      showNotification('Please enter a valid college code', 'error');
-      return;
-    }
-
     const formData = {
       name: document.getElementById('name').value.trim(),
       email: document.getElementById('email').value.trim(),
       password: document.getElementById('password').value,
-      collegeCode: document.getElementById('collegeCode').value.trim().toUpperCase(),
       department: document.getElementById('department')?.value,
       phoneNumber: document.getElementById('phoneNumber')?.value
     };

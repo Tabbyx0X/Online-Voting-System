@@ -2,17 +2,17 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const { asyncHandler } = require('../middleware/errorHandler');
-const { isAuthenticated, authorize, filterByCollege } = require('../middleware/auth');
+const { isAuthenticated, authorize } = require('../middleware/auth');
 
 // @route   GET /api/users
 // @desc    Get all users (admin can see all colleges)
 // @access  Private/Admin
 router.get('/', isAuthenticated, authorize('admin', 'teacher'), 
-  filterByCollege, asyncHandler(async (req, res) => {
+  asyncHandler(async (req, res) => {
   
   const { page = 1, limit = 20, search, role, department, isActive } = req.query;
 
-  const query = { ...req.collegeFilter };
+  const query = {};
 
   if (search) {
     query.$or = [
@@ -27,7 +27,6 @@ router.get('/', isAuthenticated, authorize('admin', 'teacher'),
 
   const users = await User.find(query)
     .select('-password')
-    .populate('collegeId', 'name code')
     .limit(limit * 1)
     .skip((page - 1) * limit)
     .sort({ createdAt: -1 });
@@ -50,8 +49,7 @@ router.get('/', isAuthenticated, authorize('admin', 'teacher'),
 // @access  Private
 router.get('/:id', isAuthenticated, asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id)
-    .select('-password')
-    .populate('collegeId', 'name code logo');
+    .select('-password');
 
   if (!user) {
     return res.status(404).json({ 
@@ -92,7 +90,7 @@ router.put('/:id', isAuthenticated, authorize('admin'),
     });
   }
 
-  // Admin can update users from any college
+  // Admin can update any user
   if (role) user.role = role;
   if (department) user.department = department;
   if (isActive !== undefined) user.isActive = isActive;
@@ -122,7 +120,7 @@ router.delete('/:id', isAuthenticated, authorize('admin'),
     });
   }
 
-  // Admin can delete users from any college
+  // Admin can delete any user
   user.isActive = false;
   await user.save();
 
