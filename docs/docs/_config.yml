@@ -1,8 +1,0 @@
-# GitHub Pages Configuration
-title: Online Voting System
-description: A secure, web-based voting platform built with Flask, MySQL, and Bootstrap
-theme: jekyll-theme-cayman
-show_downloads: true
-github:
-  repository_url: https://github.com/Tabbyx0X/TYIT-Project
-  is_project_page: true
