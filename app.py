@@ -77,6 +77,13 @@ def sanitize_input(text):
     return bleach.clean(str(text).strip(), tags=[], strip=True)
 
 
+def parse_local_datetime_to_utc(datetime_str, timezone_offset_minutes):
+    """Convert browser local datetime-local input into naive UTC datetime."""
+    local_dt = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
+    # JS getTimezoneOffset(): UTC - local (e.g. IST returns -330)
+    return local_dt + timedelta(minutes=timezone_offset_minutes)
+
+
 # Use /tmp for instance folder (writable in serverless environments)
 app = Flask(__name__, instance_path='/tmp')
 app.config.from_object(Config)
@@ -154,7 +161,7 @@ class Election(db.Model):
     creator = db.relationship('Admin', foreign_keys=[created_by])
 
     def update_status(self):
-        now = datetime.now()
+        now = datetime.utcnow()
         if now < self.start_date:
             self.status = 'upcoming'
         elif now > self.end_date:
@@ -454,8 +461,9 @@ def add_election():
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
-        start_date = datetime.strptime(request.form.get('start_date'), '%Y-%m-%dT%H:%M')
-        end_date = datetime.strptime(request.form.get('end_date'), '%Y-%m-%dT%H:%M')
+        timezone_offset = int(request.form.get('timezone_offset', '0'))
+        start_date = parse_local_datetime_to_utc(request.form.get('start_date'), timezone_offset)
+        end_date = parse_local_datetime_to_utc(request.form.get('end_date'), timezone_offset)
         
         election = Election(
             title=title,
@@ -482,8 +490,9 @@ def edit_election(election_id):
     if request.method == 'POST':
         election.title = request.form.get('title')
         election.description = request.form.get('description')
-        election.start_date = datetime.strptime(request.form.get('start_date'), '%Y-%m-%dT%H:%M')
-        election.end_date = datetime.strptime(request.form.get('end_date'), '%Y-%m-%dT%H:%M')
+        timezone_offset = int(request.form.get('timezone_offset', '0'))
+        election.start_date = parse_local_datetime_to_utc(request.form.get('start_date'), timezone_offset)
+        election.end_date = parse_local_datetime_to_utc(request.form.get('end_date'), timezone_offset)
         election.update_status()
         
         db.session.commit()
