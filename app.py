@@ -696,11 +696,10 @@ def voter_login():
 def voter_forgot_password():
     """Handle forgot password request"""
     if request.method == 'POST':
-        voter_id = request.form.get('voter_id', '').strip()
         email = request.form.get('email', '').strip().lower()
         
-        # Find voter by voter_id and email
-        voter = Voter.query.filter_by(voter_id=voter_id, email=email).first()
+        # Find voter by email only
+        voter = Voter.query.filter_by(email=email).first()
         
         if voter:
             # Generate secure token
