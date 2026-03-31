@@ -673,8 +673,12 @@ def voter_register():
 @limiter.limit("5 per minute", error_message="Too many login attempts. Please wait a minute.")
 def voter_login():
     if request.method == 'POST':
-        email = sanitize_input(request.form.get('email')).lower()
-        password = request.form.get('password')
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        
+        if not email or not password:
+            flash('Email and password are required', 'danger')
+            return redirect(url_for('voter_login'))
         
         voter = Voter.query.filter_by(email=email).first()
         
